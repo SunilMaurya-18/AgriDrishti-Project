@@ -154,7 +154,7 @@ export default function DashboardPage() {
               <p className="text-sm text-gray-400 py-4 text-center">Connect a sensor to get recommendations</p>
             ) : recs.slice(0, 3).map((r) => (
               <div key={r.id} className={`flex gap-3 p-3 rounded-xl text-sm ${r.priority === 'critical' ? 'bg-red-50' : r.priority === 'high' ? 'bg-amber-50' :
-                  r.priority === 'medium' ? 'bg-blue-50' : 'bg-agri-50'}`}>
+                r.priority === 'medium' ? 'bg-blue-50' : 'bg-agri-50'}`}>
                 <span className="text-lg flex-shrink-0">{r.icon}</span>
                 <div>
                   <p className="font-semibold text-gray-800 text-xs">{r.title}</p>
@@ -173,7 +173,7 @@ export default function DashboardPage() {
           {dash?.latest_disease ? (
             <div className="space-y-3">
               <div className={`p-3 rounded-xl text-sm font-semibold ${dash.latest_disease.severity === 'critical' ? 'bg-red-50 text-red-700' :
-                  dash.latest_disease.severity === 'high' ? 'bg-orange-50 text-orange-700' : 'bg-agri-50 text-agri-700'}`}>
+                dash.latest_disease.severity === 'high' ? 'bg-orange-50 text-orange-700' : 'bg-agri-50 text-agri-700'}`}>
                 {dash.latest_disease.disease_name}
               </div>
               <div className="text-xs text-gray-500 space-y-1">
