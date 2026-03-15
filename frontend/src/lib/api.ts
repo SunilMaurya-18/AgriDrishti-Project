@@ -33,7 +33,7 @@ export const tokenHelpers = {
 // ---------------------------------------------------------------------------
 export const api = axios.create({
   baseURL: `${API_URL}/api`,
-  timeout: 30_000,
+  timeout: 120_000, // Increased to 120s to accommodate Render free-tier cold starts
   headers: { 'Content-Type': 'application/json' },
 });
 
