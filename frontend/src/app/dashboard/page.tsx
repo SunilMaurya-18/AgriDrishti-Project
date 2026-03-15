@@ -73,6 +73,7 @@ export default function DashboardPage() {
   useWebSocket(wsHandler);
 
   const s    = dash?.latest_reading ?? null;
+
   const wkly = dash?.weekly_trend   ?? [];
   const recs  = dash?.recommendations ?? [];
 
@@ -100,7 +101,7 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      {error && (
+      {!!error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700 text-sm font-medium">
           ⚠️ Could not load sensor data. Make sure the backend is running and your IoT device is connected.
         </div>

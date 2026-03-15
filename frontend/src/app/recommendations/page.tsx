@@ -86,7 +86,7 @@ export default function RecommendationsPage() {
         </div>
       )}
 
-      {error && (
+      {!!error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700 text-sm">
           ⚠️ Failed to load recommendations. Ensure the backend and sensors are connected.
         </div>

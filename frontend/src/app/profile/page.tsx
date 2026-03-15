@@ -49,6 +49,7 @@ export default function ProfilePage() {
     setPwForm((prev) => ({ ...prev, [field]: e.target.value }));
 
   const profileMutation = useMutation(
+    ['profile'],
     () => authAPI.profile({
       name: form.name.trim(), phone: form.phone.trim() || undefined,
       farm_size_acres: form.farm_size_acres ? parseFloat(form.farm_size_acres) : undefined,
@@ -56,11 +57,12 @@ export default function ProfilePage() {
     }).then((r) => r.data as { user: AuthUser }),
     {
       onSuccess: (data) => { updateUser(data.user); toast.success('Profile updated!'); },
-      onError:   ()     => toast.error('Failed to update profile'),
+      onError:   ()     => { toast.error('Failed to update profile'); },
     }
   );
 
   const passwordMutation = useMutation(
+    ['password'],
     () => authAPI.password({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword }).then((r) => r.data),
     {
       onSuccess: () => { toast.success('Password changed!'); setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' }); },
