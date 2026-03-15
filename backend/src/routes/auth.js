@@ -42,7 +42,7 @@ router.post('/signup', [
     });
   } catch (err) {
     console.error('[SIGNUP ERROR]', err);
-    res.status(500).json({ error: 'Failed to create account' });
+    res.status(500).json({ error: 'Failed to create account', details: err.message, stack: err.stack });
   }
 });
 
@@ -77,7 +77,7 @@ router.post('/login', [
     });
   } catch (err) {
     console.error('[LOGIN ERROR]', err);
-    res.status(500).json({ error: 'Login failed' });
+    res.status(500).json({ error: 'Login failed', details: err.message, stack: err.stack });
   }
 });
 
