@@ -21,7 +21,8 @@ export default function ClientGoogleLogin({ onSuccess, onError, text = 'signin_w
     setMounted(true);
   }, []);
 
-  if (!mounted) return null;
+  // Don't render if not mounted (SSR) or if no Google Client ID is configured
+  if (!mounted || !process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) return null;
 
   return (
     <GoogleLogin
