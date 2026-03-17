@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
+const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
+const OTP = require('../models/OTP');
 const { protect, signToken } = require('../middleware/auth');
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // ─── POST /api/auth/signup ───────────────────────────────
 router.post('/signup', [
@@ -121,6 +125,128 @@ router.put('/password', protect, [
     res.json({ message: 'Password updated successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Password update failed' });
+  }
+});
+
+// ─── POST /api/auth/google ───────────────────────────────
+router.post('/google', [
+  body('credential').notEmpty().withMessage('Google credential token required'),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ error: errors.array()[0].msg });
+
+  const { credential } = req.body;
+
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      return res.status(400).json({ error: 'Invalid Google token' });
+    }
+
+    const { email, name, sub: googleId, picture } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // If user exists, update googleId and avatar if not present
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.avatar = user.avatar || picture;
+        await user.save();
+      }
+    } else {
+      // Create new user for Google login
+      user = await User.create({
+        name,
+        email,
+        googleId,
+        avatar: picture,
+      });
+    }
+
+    if (!user.is_active) {
+      return res.status(403).json({ error: 'Account deactivated. Contact support.' });
+    }
+
+    const token = signToken(user._id);
+
+    res.json({
+      message: 'Google Login successful',
+      token,
+      user: user.toJSON(),
+    });
+  } catch (err) {
+    console.error('[GOOGLE LOGIN ERROR]', err);
+    res.status(500).json({ error: 'Google login failed' });
+  }
+});
+
+// ─── POST /api/auth/send-otp ─────────────────────────────
+router.post('/send-otp', [
+  body('phone').notEmpty().withMessage('Phone number is required'),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ error: errors.array()[0].msg });
+
+  const { phone } = req.body;
+
+  try {
+    // Generate 6-digit OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // In a real scenario, you'd integrate Twilio/SNS here
+    console.log(`\n============================`);
+    console.log(`[MOCK SMS] OTP for ${phone}: ${otpCode}`);
+    console.log(`============================\n`);
+
+    // Remove any existing OTP for this phone number
+    await OTP.deleteMany({ phone });
+
+    // Save new OTP
+    await OTP.create({ phone, otp: otpCode });
+
+    res.json({ message: 'OTP sent successfully (Check console)' });
+  } catch (err) {
+    console.error('[SEND OTP ERROR]', err);
+    res.status(500).json({ error: 'Failed to send OTP' });
+  }
+});
+
+// ─── POST /api/auth/verify-otp ───────────────────────────
+router.post('/verify-otp', protect, [
+  body('phone').notEmpty().withMessage('Phone number is required'),
+  body('otp').notEmpty().withMessage('OTP is required'),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ error: errors.array()[0].msg });
+
+  const { phone, otp } = req.body;
+
+  try {
+    const otpRecord = await OTP.findOne({ phone, otp });
+    
+    if (!otpRecord) {
+      return res.status(400).json({ error: 'Invalid or expired OTP' });
+    }
+
+    // Mark user's phone as verified
+    await User.findByIdAndUpdate(req.user._id, {
+      phone,
+      isPhoneVerified: true
+    });
+
+    // Delete OTP record since it's used
+    await OTP.deleteOne({ _id: otpRecord._id });
+
+    res.json({ message: 'Phone number verified successfully' });
+  } catch (err) {
+    console.error('[VERIFY OTP ERROR]', err);
+    res.status(500).json({ error: 'Failed to verify OTP' });
   }
 });
 

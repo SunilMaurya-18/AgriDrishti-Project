@@ -18,10 +18,14 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
+    required: [
+      function () { return !this.googleId; },
+      'Password is required'
+    ],
     minlength: [6, 'Password must be at least 6 characters'],
     select: false,
   },
+  googleId: { type: String, sparse: true, unique: true },
   farm_location: {
     city: { type: String, trim: true },
     state: { type: String, trim: true },
@@ -30,6 +34,7 @@ const userSchema = new mongoose.Schema({
     lon: { type: Number },
   },
   phone: { type: String, trim: true },
+  isPhoneVerified: { type: Boolean, default: false },
   farm_size_acres: { type: Number },
   crop_types: [{ type: String }],
   avatar: { type: String },

@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '@/lib/AuthContext';
 import { QueryProvider } from '@/lib/QueryProvider';
+import { GoogleAuthWrapper } from '@/lib/GoogleAuthWrapper';
 
 // Load Inter via next/font — avoids external <link> tags that can fail CSP on Vercel
 const inter = Inter({
@@ -26,6 +27,7 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body>
         <QueryProvider>
+          <GoogleAuthWrapper>
           <AuthProvider>
             {children}
 
@@ -48,6 +50,7 @@ export default function RootLayout({
               }}
             />
           </AuthProvider>
+          </GoogleAuthWrapper>
         </QueryProvider>
       </body>
     </html>

@@ -40,10 +40,10 @@ export default function DiseasePage() {
   const detect = useMutation(
     (fd: FormData) => diseaseAPI.detect(fd).then((r) => r.data as DetectionResult),
     {
-      onSuccess: () => { qc.invalidateQueries('disease-history'); toast.success('Analysis complete!'); },
+      onSuccess: () => { qc.invalidateQueries('disease-history'); toast.success('Analysis complete!', { id: 'disease-success' }); },
       onError: (err: unknown) => {
         const msg = err instanceof AxiosError ? (err.response?.data?.error ?? 'Detection failed') : 'Detection failed';
-        toast.error(typeof msg === 'string' ? msg : 'Detection failed. Is the AI service running?');
+        toast.error(typeof msg === 'string' ? msg : 'Detection failed. Is the AI service running?', { id: 'disease-error' });
       },
     }
   );

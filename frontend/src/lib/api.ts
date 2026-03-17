@@ -87,11 +87,14 @@ export interface SignupPayload {
 }
 
 export const authAPI = {
-  login:    (data: LoginPayload)  => api.post('/auth/login', data),
-  signup:   (data: SignupPayload) => api.post('/auth/signup', data),
-  me:       ()                    => api.get('/auth/me'),
-  profile:  (data: object)        => api.put('/auth/profile', data),
-  password: (data: object)        => api.put('/auth/password', data),
+  login:       (data: LoginPayload)  => api.post('/auth/login', data),
+  signup:      (data: SignupPayload) => api.post('/auth/signup', data),
+  googleLogin: (credential: string)  => api.post('/auth/google', { credential }),
+  sendOtp:     (phone: string)       => api.post('/auth/send-otp', { phone }),
+  verifyOtp:   (phone: string, otp: string) => api.post('/auth/verify-otp', { phone, otp }),
+  me:          ()                    => api.get('/auth/me'),
+  profile:     (data: object)        => api.put('/auth/profile', data),
+  password:    (data: object)        => api.put('/auth/password', data),
 };
 
 export const dashboardAPI = {

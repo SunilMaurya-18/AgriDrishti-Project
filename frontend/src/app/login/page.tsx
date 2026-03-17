@@ -7,16 +7,15 @@ import toast from 'react-hot-toast';
 import { Eye, EyeOff, Loader } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { AxiosError } from 'axios';
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 function getErrorMessage(err: unknown): string {
   if (err instanceof AxiosError) {
-    // Server returned a JSON error body
     const serverMsg = err.response?.data?.error as string | undefined;
     if (serverMsg) return serverMsg;
-    // Network / CORS error — no response at all
     if (!err.response) {
       return 'Cannot reach the server. Check your internet connection.';
     }
@@ -24,9 +23,6 @@ function getErrorMessage(err: unknown): string {
   return 'Login failed. Please try again.';
 }
 
-// ---------------------------------------------------------------------------
-// Input className — extracted so it doesn't create a new object every render
-// ---------------------------------------------------------------------------
 const inputCls =
   'w-full px-4 py-3 rounded-xl border border-agri-200 bg-white text-sm ' +
   'text-gray-800 placeholder-gray-300 ' +
@@ -37,18 +33,17 @@ const inputCls =
 // Page
 // ---------------------------------------------------------------------------
 export default function LoginPage() {
-  const { login } = useAuth();
-  const router    = useRouter();
+  const { login, googleLogin } = useAuth();
+  const router = useRouter();
 
-  const [email,    setEmail]    = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPw,   setShowPw]   = useState(false);
-  const [loading,  setLoading]  = useState(false);
+  const [showPw, setShowPw] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // Stable handlers — defined once, not recreated on each render
-  const handleEmailChange    = (e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
+  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
-  const toggleShowPw         = () => setShowPw((prev) => !prev);
+  const toggleShowPw = () => setShowPw((prev) => !prev);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,6 +56,24 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email.trim(), password);
+      toast.success('Welcome back! 🌱');
+      router.push('/dashboard');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Google Login handler
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    if (!credentialResponse.credential) {
+      toast.error('Google login failed. No credential received.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await googleLogin(credentialResponse.credential);
       toast.success('Welcome back! 🌱');
       router.push('/dashboard');
     } catch (err: unknown) {
@@ -92,6 +105,26 @@ export default function LoginPage() {
         <div className="bg-white rounded-3xl shadow-2xl border border-agri-100 p-8">
           <h2 className="text-xl font-bold text-agri-700 mb-1">Welcome back</h2>
           <p className="text-sm text-gray-400 mb-6">Sign in to your farm dashboard</p>
+
+          {/* Google Sign-In */}
+          <div className="flex justify-center mb-4">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => toast.error('Google sign-in failed')}
+              theme="outline"
+              size="large"
+              text="signin_with"
+              shape="rectangular"
+              width="350"
+            />
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">or sign in with email</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
 
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
             {/* Email */}
@@ -183,4 +216,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
