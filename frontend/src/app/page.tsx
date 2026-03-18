@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Droplets, Sprout, ShieldCheck, BarChart3, Users, Factory, ArrowRight, Activity, Leaf, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 // ----------------------------------------------------------------------
 // Landing Navbar
@@ -24,6 +25,7 @@ function LandingNavbar() {
           <a href="#use-cases" className="hover:text-primary transition-colors">Use Cases</a>
         </div>
         <div className="flex items-center gap-4">
+          <ThemeToggle />
           <Link href="/login">
             <Button variant="ghost" className="font-bold hidden sm:inline-flex">Sign In</Button>
           </Link>
