@@ -81,19 +81,96 @@ function HeroSection() {
         initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}
         className="mt-20 relative w-full max-w-5xl mx-auto"
       >
-         <div className="relative rounded-[2rem] border border-border/50 bg-card/40 backdrop-blur-2xl p-2 md:p-4 shadow-2xl overflow-hidden">
-           <Image src="/hero-mockup.png" alt="PrithviCore Dashboard Mockup" width={1600} height={900} className="rounded-xl border border-border/50 shadow-inner w-full h-auto object-cover" priority />
-         </div>
-         
-         {/* Floating Elements */}
-         <motion.div animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }} 
-           className="absolute -right-8 top-1/4 bg-background border border-border shadow-xl rounded-2xl p-4 flex items-center gap-4 hidden lg:flex">
-             <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center text-green-500"><CheckCircle2 /></div>
-             <div>
-               <p className="text-sm font-bold text-foreground">Optimal Soil pH</p>
-               <p className="text-xs text-muted-foreground">Adjustments successful</p>
+         {/* Animated CSS Dashboard Mockup */}
+         <div className="relative rounded-[2.5rem] border border-border/40 bg-card/20 backdrop-blur-3xl p-6 shadow-2xl overflow-hidden min-h-[450px] w-full flex flex-col gap-6 ring-1 ring-white/10 dark:ring-white/5">
+           {/* Header Bar */}
+           <div className="w-full h-12 flex items-center justify-between border-b border-border/50 pb-4">
+             <div className="flex gap-2">
+               <div className="w-3 h-3 rounded-full bg-destructive/80" />
+               <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+               <div className="w-3 h-3 rounded-full bg-green-500/80" />
              </div>
-         </motion.div>
+             <div className="h-6 w-32 bg-primary/20 rounded-full animate-pulse" />
+           </div>
+           
+           <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
+             {/* Animated Chart Area */}
+             <div className="col-span-2 flex flex-col gap-6">
+               <div className="flex gap-6">
+                 {/* Stat Cards */}
+                 <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} className="flex-1 bg-background/50 rounded-2xl p-4 border border-border/50 shadow-sm relative overflow-hidden">
+                   <div className="absolute top-0 right-0 w-16 h-16 bg-primary/20 blur-2xl rounded-full" />
+                   <div className="w-10 h-10 rounded-xl bg-primary/20 text-primary flex items-center justify-center mb-3"><Leaf size={20} /></div>
+                   <div className="w-12 h-3 bg-muted rounded mb-2" />
+                   <div className="w-24 h-5 bg-foreground/80 rounded" />
+                 </motion.div>
+                 <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 3.5, delay: 0.5, repeat: Infinity, ease: "easeInOut" }} className="flex-1 bg-background/50 rounded-2xl p-4 border border-border/50 shadow-sm relative overflow-hidden">
+                   <div className="absolute top-0 right-0 w-16 h-16 bg-teal-500/20 blur-2xl rounded-full" />
+                   <div className="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center mb-3"><Droplets size={20} /></div>
+                   <div className="w-12 h-3 bg-muted rounded mb-2" />
+                   <div className="w-24 h-5 bg-foreground/80 rounded" />
+                 </motion.div>
+               </div>
+               
+               {/* Animated Line Chart */}
+               <div className="flex-1 bg-background/50 rounded-2xl border border-border/50 p-6 relative overflow-hidden flex flex-col justify-end">
+                 <div className="absolute top-6 left-6 w-32 h-4 bg-muted rounded-md" />
+                 {/* X/Y Guide lines */}
+                 <div className="absolute bottom-6 left-6 right-6 border-b border-border/50" />
+                 <div className="absolute top-12 bottom-6 left-6 border-l border-border/50" />
+                 
+                 {/* SVG Animated Sparkline */}
+                 <svg className="w-full h-32 ml-4 -mb-2 overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 40">
+                   <motion.path 
+                     d="M0,30 C20,25 30,10 50,20 C70,30 80,5 100,10" 
+                     fill="none" stroke="currentColor" strokeWidth="2.5" className="text-primary drop-shadow-[0_0_8px_rgba(34,197,94,0.5)]"
+                     initial={{ pathLength: 0 }} 
+                     animate={{ pathLength: 1 }} 
+                     transition={{ duration: 2, ease: "easeInOut", delay: 0.5 }} 
+                   />
+                   <motion.path 
+                     d="M0,30 C20,25 30,10 50,20 C70,30 80,5 100,10 L100,40 L0,40 Z" 
+                     fill="url(#gradient)" className="opacity-30"
+                     initial={{ opacity: 0 }} 
+                     animate={{ opacity: 0.3 }} 
+                     transition={{ duration: 1, delay: 1.5 }} 
+                   />
+                   <defs>
+                     <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
+                       <stop offset="0%" stopColor="currentColor" className="text-primary" />
+                       <stop offset="100%" stopColor="transparent" />
+                     </linearGradient>
+                   </defs>
+                 </svg>
+               </div>
+             </div>
+             
+             {/* Right Sidebar Mockup */}
+             <div className="col-span-1 flex flex-col gap-4">
+               <div className="h-16 w-full bg-background/50 rounded-2xl border border-border/50 flex items-center p-4 gap-3">
+                 <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center"><Activity size={18} /></div>
+                 <div className="flex-1">
+                   <div className="h-3 w-3/4 bg-foreground/60 rounded mb-2" />
+                   <div className="h-2 w-1/2 bg-muted rounded" />
+                 </div>
+               </div>
+               
+               <div className="flex-1 w-full bg-background/50 rounded-2xl border border-border/50 p-4 flex flex-col gap-4">
+                 <div className="h-4 w-1/2 bg-muted rounded" />
+                 {/* Skeleton List */}
+                 {[...Array(4)].map((_, i) => (
+                   <motion.div key={i} animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, delay: i * 0.2, repeat: Infinity }} className="flex gap-3 items-center">
+                     <div className="w-8 h-8 rounded-lg bg-border/50" />
+                     <div className="flex-1 flex flex-col gap-1.5">
+                       <div className="h-2 w-full bg-muted/80 rounded" />
+                       <div className="h-2 w-3/4 bg-muted/40 rounded" />
+                     </div>
+                   </motion.div>
+                 ))}
+               </div>
+             </div>
+           </div>
+         </div>
          <motion.div animate={{ y: [0, 15, 0] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }} 
            className="absolute -left-12 bottom-1/4 bg-background border border-border shadow-xl rounded-2xl p-4 flex items-center gap-4 hidden lg:flex">
              <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500"><Activity /></div>
