@@ -82,13 +82,7 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          {/* Avatar Group */}
-          <div className="hidden sm:flex items-center -space-x-2 mr-2 hover:-space-x-1 transition-all duration-300">
-             <div className="w-8 h-8 rounded-full border-2 border-background bg-blue-500 text-white text-xs font-bold flex items-center justify-center shadow-sm z-30">SA</div>
-             <div className="w-8 h-8 rounded-full border-2 border-background bg-purple-500 text-white text-xs font-bold flex items-center justify-center shadow-sm z-20">RB</div>
-             <div className="w-8 h-8 rounded-full border-2 border-background bg-primary/20 text-primary text-xs font-bold flex items-center justify-center shadow-sm z-10 backdrop-blur-sm">+3</div>
-          </div>
-          <Button variant="outline" onClick={() => qc.invalidateQueries('dashboard')} className="gap-2 font-semibold shadow-sm rounded-xl hover:bg-primary hover:text-primary-foreground border-border/50 transition-colors" disabled={isLoading}>
+          <Button variant="outline" onClick={() => qc.invalidateQueries('dashboard')} className="gap-2 font-semibold shadow-sm rounded-xl hover:bg-gradient-to-r hover:from-[#0B3D2E] hover:to-[#14B8A6] hover:text-white border-border/50 hover:border-transparent transition-all" disabled={isLoading}>
             <RefreshCw size={16} className={cn(isLoading && "animate-spin")} /> Refresh
           </Button>
         </div>
