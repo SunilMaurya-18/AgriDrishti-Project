@@ -115,7 +115,7 @@ export default function DashboardPage() {
       <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6 lg:space-y-8">
         
         {/* Core Sensors */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
           {[
             { label: "Soil Moisture", value: s?.moisture, unit: "%", icon: "💧", ...s ? moistureStatus(s.moisture) : { status: 'info' as const } },
             { label: "Temperature", value: s?.temperature, unit: "°C", icon: "🌡️", ...s ? tempStatus(s.temperature) : { status: 'info' as const } },
@@ -129,7 +129,7 @@ export default function DashboardPage() {
         </div>
 
         {/* NPK Sensors */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
            {[
              { label: "Nitrogen (N)", val: s?.nitrogen, unit: "mg/kg", icon: "🌿", ...s ? npkStatus(s.nitrogen, 50) : { status: 'info' as const, statusLabel: undefined } },
              { label: "Phosphorus (P)", val: s?.phosphorus, unit: "mg/kg", icon: "🌾", ...s ? npkStatus(s.phosphorus, 25) : { status: 'info' as const, statusLabel: undefined } },

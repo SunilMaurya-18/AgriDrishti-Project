@@ -23,13 +23,11 @@ export default function Navbar({ alerts = [] }: NavbarProps) {
   const unread = alerts.length;
 
   return (
-    <nav className="sticky top-0 z-50 h-[62px] bg-background/80 backdrop-blur-md border-b border-border text-foreground flex items-center justify-between px-6 shadow-sm transition-colors">
-      <Link href="/dashboard" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-        <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-xl select-none shadow-sm shadow-primary/30">🌿</div>
-        <div>
-          <span className="text-lg font-extrabold tracking-tight">PrithviCore</span>
-        </div>
-      </Link>
+    <nav className="sticky top-0 z-40 h-[72px] bg-background/80 backdrop-blur-xl border-b border-border/50 flex items-center justify-between px-6 shadow-sm transition-colors">
+      <div className="flex items-center">
+        {/* Breadcrumb or Page Title can go here in the future if needed, currently empty to align right actions cleanly */}
+        <span className="text-xl font-bold tracking-tight md:hidden">PrithviCore</span>
+      </div>
 
       <div className="flex items-center gap-3">
         {/* Live indicator */}

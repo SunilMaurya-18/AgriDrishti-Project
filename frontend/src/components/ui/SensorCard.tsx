@@ -38,28 +38,33 @@ export default function SensorCard({
     <Card className={cn("overflow-hidden group transition-all duration-300 hover:shadow-md", STATUS_BORDER_STYLES[status])}>
       <CardContent className={cn("p-5 h-full flex flex-col justify-between", loading && "animate-pulse")}>
         {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="text-2xl opacity-90 group-hover:scale-110 transition-transform duration-300 select-none">{icon}</div>
+        <div className="flex items-start justify-between mb-6 relative z-10">
+          <div className="text-2xl opacity-80 group-hover:scale-110 transition-transform duration-300 select-none bg-background p-2 rounded-xl shadow-sm border border-border/50">{icon}</div>
           {statusLabel && (
-            <span className={cn('text-[11px] font-bold px-2 py-0.5 rounded-full', BADGE_STYLES[status])}>
+            <span className={cn('text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full shadow-sm', BADGE_STYLES[status])}>
               {statusLabel}
             </span>
           )}
         </div>
 
         {/* Value */}
-        <div className="mb-2">
+        <div className="mb-2 relative z-10">
           {loading ? (
-            <div className="h-9 w-24 bg-muted rounded-md" />
+            <div className="h-10 w-28 bg-muted rounded-md" />
           ) : (
             <div className="flex items-baseline gap-1.5">
-              <span className="text-3xl font-extrabold tabular-nums tracking-tighter text-foreground">
+              <span className="text-4xl font-black tabular-nums tracking-tighter text-foreground drop-shadow-sm">
                 {value !== null && value !== undefined ? value.toFixed(unit === 'pH' ? 2 : 1) : '–'}
               </span>
-              <span className="text-sm font-medium text-muted-foreground">{unit}</span>
+              <span className="text-sm font-bold text-muted-foreground">{unit}</span>
             </div>
           )}
         </div>
+        
+        {/* Background Sparkline (Dummy) */}
+        <svg className="absolute bottom-0 left-0 w-full h-1/2 opacity-[0.03] group-hover:opacity-10 transition-opacity duration-500 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 50">
+          <path d="M0,50 L0,30 C20,20 40,40 60,10 C80,-10 90,20 100,5 L100,50 Z" fill="currentColor" />
+        </svg>
 
         {/* Label */}
         <p className="text-sm font-semibold text-muted-foreground">{label}</p>

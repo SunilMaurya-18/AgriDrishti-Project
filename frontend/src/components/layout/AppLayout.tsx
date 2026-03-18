@@ -59,12 +59,16 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors selection:bg-primary/20 relative z-0">
-      <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-background to-background animate-in fade-in duration-1000" />
-      <Navbar alerts={alerts} />
-      <div className="flex flex-1 overflow-hidden z-10 w-full">
-        <Sidebar />
-        <main className="flex-1 p-6 md:p-8 overflow-y-auto animate-fade-in custom-scrollbar bg-accent/20">
+    <div className="min-h-screen bg-[#F5F7F6] dark:bg-[#0F172A] text-foreground transition-colors selection:bg-primary/20 relative z-0">
+      <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#22C55E]/5 via-transparent to-transparent animate-in fade-in duration-1000" />
+      
+      <Sidebar />
+      
+      {/* Main scrolling wrapper */}
+      <div className="md:ml-[260px] flex flex-col min-h-screen w-full md:w-[calc(100%-260px)] transition-all">
+        <Navbar alerts={alerts} />
+        
+        <main className="flex-1 p-6 md:p-8 animate-fade-in custom-scrollbar">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>
