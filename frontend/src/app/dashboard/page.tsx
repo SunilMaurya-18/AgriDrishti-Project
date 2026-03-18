@@ -23,6 +23,8 @@ interface Recommendation { id: string; icon: string; title: string; action: stri
 interface DiseaseResult { disease_name: string; severity: string; confidence: number; treatment: string; }
 interface DashboardData { latest_reading: SensorReading | null; weekly_trend: Record<string, number | string>[]; recommendations: Recommendation[]; latest_disease: DiseaseResult | null; }
 interface WeatherCurrent { temperature: number; description: string; humidity: number; wind_speed: number; icon: string; city: string; }
+interface WeatherForecastItem { time: number; temperature: number; description: string; icon: string; }
+interface WeatherResponse { current?: WeatherCurrent; forecast?: WeatherForecastItem[]; }
 
 function moistureStatus(v: number) { if (v < 20) return { status: 'danger' as const, statusLabel: 'Critical Low' }; if (v < 35) return { status: 'warning' as const, statusLabel: 'Low' }; if (v > 70) return { status: 'warning' as const, statusLabel: 'Waterlogged' }; return { status: 'optimal' as const, statusLabel: 'Optimal' }; }
 function tempStatus(v: number) { if (v > 35) return { status: 'danger' as const, statusLabel: 'Heat Stress' }; if (v < 10) return { status: 'warning' as const, statusLabel: 'Cold Risk' }; return { status: 'optimal' as const, statusLabel: 'Normal' }; }
@@ -46,9 +48,9 @@ export default function DashboardPage() {
     { refetchInterval: 60_000 }
   );
 
-  const { data: weatherData } = useQuery<{ current?: WeatherCurrent }>(
+  const { data: weatherData } = useQuery<WeatherResponse>(
     'weather',
-    () => weatherAPI.get().then((r) => r.data as { current?: WeatherCurrent }),
+    () => weatherAPI.get().then((r) => r.data as WeatherResponse),
     { refetchInterval: 10 * 60_000, staleTime: 5 * 60_000 }
   );
 
@@ -135,15 +137,15 @@ export default function DashboardPage() {
            ))}
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <motion.div variants={itemVariants} className="xl:col-span-2 space-y-6">
-            <Card className="shadow-sm overflow-hidden relative">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <motion.div variants={itemVariants} className="space-y-6 h-full">
+            <Card className="shadow-sm overflow-hidden relative h-full">
               <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10 -translate-y-1/2 translate-x-1/3" />
               <CardHeader className="pb-2 border-b border-border/30">
                 <CardTitle className="text-lg flex items-center gap-2"><Activity size={18} className="text-primary" /> Multi-Layer Soil Insights</CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-8">
                   <div>
                     <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">7-Day Condition Trend</h4>
                     {isLoading ? <Skeleton className="h-[220px] w-full" /> : wkly.length > 0 ? <SoilTrendChart data={wkly} height={220} /> : <EmptyChart message="Sensor history graph goes here" />}
@@ -157,29 +159,8 @@ export default function DashboardPage() {
             </Card>
           </motion.div>
 
-          {/* Right sidebar insights */}
-          <motion.div variants={itemVariants} className="space-y-6">
-             <WeatherCard current={weatherData?.current} />
-             
-             {/* Dynamic Activity Feed */}
-             <Card className="shadow-sm">
-               <CardHeader className="pb-3 border-b border-border/30">
-                 <CardTitle className="text-base font-bold flex items-center gap-2"><Activity size={16} className="text-blue-500" /> Farm Activity Feed</CardTitle>
-               </CardHeader>
-               <CardContent className="pt-4 p-0">
-                 <div className="divide-y divide-border/50 max-h-[220px] overflow-y-auto custom-scrollbar">
-                   {ACTIVITY_LOG.map((log) => (
-                     <div key={log.id} className="p-4 flex gap-3 hover:bg-muted/30 transition-colors group">
-                       <div className="mt-0.5"><log.icon size={16} className="text-muted-foreground group-hover:text-primary transition-colors" /></div>
-                       <div>
-                         <p className="text-sm font-medium text-foreground">{log.msg}</p>
-                         <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mt-1">{log.time}</p>
-                       </div>
-                     </div>
-                   ))}
-                 </div>
-               </CardContent>
-             </Card>
+          <motion.div variants={itemVariants} className="space-y-6 h-full">
+             <WeatherCard weather={weatherData} />
           </motion.div>
         </div>
 
@@ -283,24 +264,35 @@ function EmptyChart({ message }: { message: string }) {
   );
 }
 
-function WeatherCard({ current: c }: { current?: WeatherCurrent }) {
+function WeatherCard({ weather }: { weather?: WeatherResponse }) {
+  const c = weather?.current;
+  const f = weather?.forecast;
+
+  const dailyForecasts = f ? Object.values(f.reduce((acc: { [key: string]: any }, curr) => {
+    const date = new Date(curr.time * 1000).toLocaleDateString('en-US', { weekday: 'short' });
+    if (!acc[date]) acc[date] = curr;
+    return acc;
+  }, {}))
+  .slice(0, 5) : [];
+
   return (
-    <Card className="bg-gradient-to-br from-[#1e3a8a] to-[#3b82f6] text-white shadow-lg shadow-blue-500/20 border-0 relative overflow-hidden flex flex-col hover:-translate-y-0.5 transition-transform duration-300">
+    <Card className="bg-gradient-to-br from-[#1e3a8a] to-[#3b82f6] text-white shadow-lg shadow-blue-500/20 border-0 relative overflow-hidden flex flex-col hover:-translate-y-0.5 transition-transform duration-300 h-full">
       <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none mix-blend-overlay">
         <Cloud size={160} />
       </div>
       <div className="absolute -top-24 -left-24 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
       <CardHeader className="pb-0 relative z-10 pt-5">
-        <CardTitle className="text-[10px] flex items-center gap-2 text-white/90 font-black tracking-widest uppercase">
-          <Cloud size={14} /> Current Atmosphere
+        <CardTitle className="text-[10px] flex items-center justify-between text-white/90 font-black tracking-widest uppercase">
+          <span className="flex items-center gap-2"><Cloud size={14} /> Local Weather Intelligence</span>
+          <span className="bg-white/10 px-2 py-0.5 rounded backdrop-blur-sm text-[10px] font-bold">5-DAY OUTLOOK</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-4 relative z-10 flex-1 flex flex-col justify-between">
         {c ? (
           <>
-            <div>
+            <div className="flex-1 flex flex-col justify-center">
               <div className="flex items-center gap-5 mb-4">
-                <div className="bg-white/20 rounded-3xl p-2.5 backdrop-blur-md shadow-inner border border-white/10">
+                <div className="bg-white/20 rounded-3xl p-2.5 backdrop-blur-md shadow-inner border border-white/10 shrink-0">
                   <Image src={`https://openweathermap.org/img/wn/${c.icon}@2x.png`} alt={c.description} width={68} height={68} unoptimized className="drop-shadow-lg" />
                 </div>
                 <div>
@@ -308,19 +300,28 @@ function WeatherCard({ current: c }: { current?: WeatherCurrent }) {
                   <div className="text-base font-bold capitalize text-white/90 drop-shadow-sm mt-1">{c.description}</div>
                 </div>
               </div>
-              <div className="text-xs font-bold text-white/90 flex items-center gap-2 mt-4 bg-black/10 w-fit px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10 shadow-sm">
-                <span className="inline-block w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]"></span>
-                {c.city}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="bg-black/20 backdrop-blur-md rounded-2xl p-3 border border-white/5 flex items-center justify-between">
+                  <div className="text-white/70 text-[10px] font-black uppercase tracking-widest"><Droplets size={12} className="text-blue-300 inline mr-1"/> Humid</div>
+                  <div className="font-black text-base">{c.humidity}%</div>
+                </div>
+                <div className="bg-black/20 backdrop-blur-md rounded-2xl p-3 border border-white/5 flex items-center justify-between">
+                  <div className="text-white/70 text-[10px] font-black uppercase tracking-widest"><Wind size={12} className="text-teal-300 inline mr-1"/> Wind</div>
+                  <div className="font-black text-base">{c.wind_speed} <span className="text-[9px] font-bold text-white/60 lowercase">m/s</span></div>
+                </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 mt-6">
-              <div className="bg-black/20 backdrop-blur-md rounded-2xl p-4 border border-white/5 transition-colors hover:bg-black/30">
-                <div className="text-white/70 text-[10px] font-black uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><Droplets size={12} className="text-blue-300"/> Humidity</div>
-                <div className="font-black text-xl tracking-tight">{c.humidity}%</div>
-              </div>
-              <div className="bg-black/20 backdrop-blur-md rounded-2xl p-4 border border-white/5 transition-colors hover:bg-black/30">
-                <div className="text-white/70 text-[10px] font-black uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><Wind size={12} className="text-teal-300"/> Wind</div>
-                <div className="font-black text-xl tracking-tight">{c.wind_speed} <span className="text-[11px] font-bold text-white/60 lowercase tracking-wider">m/s</span></div>
+
+            {/* 5 Day Forecast Strip */}
+            <div className="bg-black/20 rounded-2xl p-4 backdrop-blur-md border border-white/10 mt-auto shadow-inner">
+              <div className="flex justify-between items-center gap-2">
+                 {dailyForecasts.map((day, idx) => (
+                    <div key={idx} className="flex flex-col items-center justify-center p-2 rounded-xl hover:bg-white/10 transition-colors">
+                       <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">{format(day.time * 1000, 'EEE')}</span>
+                       <Image src={`https://openweathermap.org/img/wn/${day.icon}.png`} alt={day.description} width={32} height={32} unoptimized className="drop-shadow-sm my-0.5" />
+                       <span className="text-sm font-black">{day.temperature.toFixed(0)}°</span>
+                    </div>
+                 ))}
               </div>
             </div>
           </>

@@ -84,16 +84,30 @@ export function NPKChart({ data, height = 260 }: SoilChartProps) {
 
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={formatted} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+      <AreaChart data={formatted} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+        <defs>
+          <linearGradient id="nitroGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%"  stopColor="#22c55e" stopOpacity={0.4} />
+            <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="phosGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%"  stopColor="#3b82f6" stopOpacity={0.4} />
+            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="potasGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%"  stopColor="#a855f7" stopOpacity={0.4} />
+            <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
+          </linearGradient>
+        </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="#e8f7ee" />
         <XAxis dataKey="time" tick={{ fontSize: 11, fill: '#5a7464' }} />
         <YAxis tick={{ fontSize: 11, fill: '#5a7464' }} />
         <Tooltip content={<CustomTooltip />} />
         <Legend wrapperStyle={{ fontSize: 12 }} />
-        <Line type="monotone" dataKey="avg_nitrogen"   name="Nitrogen (N)"   stroke="#1a5c2a" strokeWidth={2.5} dot={false} />
-        <Line type="monotone" dataKey="avg_phosphorus" name="Phosphorus (P)" stroke="#2d8c4e" strokeWidth={2.5} dot={false} />
-        <Line type="monotone" dataKey="avg_potassium"  name="Potassium (K)"  stroke="#3dba6f" strokeWidth={2.5} dot={false} />
-      </LineChart>
+        <Area type="monotone" dataKey="avg_nitrogen"   name="Nitrogen (N)"   stroke="#22c55e" fill="url(#nitroGrad)" strokeWidth={2.5} dot={false} />
+        <Area type="monotone" dataKey="avg_phosphorus" name="Phosphorus (P)" stroke="#3b82f6" fill="url(#phosGrad)" strokeWidth={2.5} dot={false} />
+        <Area type="monotone" dataKey="avg_potassium"  name="Potassium (K)"  stroke="#a855f7" fill="url(#potasGrad)" strokeWidth={2.5} dot={false} />
+      </AreaChart>
     </ResponsiveContainer>
   );
 }

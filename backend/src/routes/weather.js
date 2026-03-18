@@ -24,10 +24,10 @@ router.get('/weather', protect, async (req, res) => {
 
     if (queryLat && queryLon) {
       currentUrl  = `${OWAPI}/weather?lat=${queryLat}&lon=${queryLon}&appid=${API_KEY}&units=metric`;
-      forecastUrl = `${OWAPI}/forecast?lat=${queryLat}&lon=${queryLon}&appid=${API_KEY}&units=metric&cnt=8`;
+      forecastUrl = `${OWAPI}/forecast?lat=${queryLat}&lon=${queryLon}&appid=${API_KEY}&units=metric`;
     } else {
       currentUrl  = `${OWAPI}/weather?q=${queryCity}&appid=${API_KEY}&units=metric`;
-      forecastUrl = `${OWAPI}/forecast?q=${queryCity}&appid=${API_KEY}&units=metric&cnt=8`;
+      forecastUrl = `${OWAPI}/forecast?q=${queryCity}&appid=${API_KEY}&units=metric`;
     }
 
     const [currentRes, forecastRes] = await Promise.all([
