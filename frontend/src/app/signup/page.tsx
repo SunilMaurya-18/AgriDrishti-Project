@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { AxiosError } from 'axios';
 import ClientGoogleLogin from '@/components/ClientGoogleLogin';
 import { authAPI } from '@/lib/api';
+import { State, City } from 'country-state-city';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -61,6 +62,25 @@ export default function SignupPage() {
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedStateCode, setSelectedStateCode] = useState('');
+
+  const getCountryCode = (name: string) => {
+    const map: Record<string, string> = { 'India': 'IN', 'Bangladesh': 'BD', 'Nepal': 'NP', 'Sri Lanka': 'LK', 'Pakistan': 'PK' };
+    return map[name] || '';
+  };
+
+  const handleCountryChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setForm(prev => ({ ...prev, country: e.target.value, state: '', city: '' }));
+    setSelectedStateCode('');
+  };
+
+  const handleStateSelect = (e: ChangeEvent<HTMLSelectElement>) => {
+    const code = e.target.value;
+    setSelectedStateCode(code);
+    const cCode = getCountryCode(form.country);
+    const stateName = State.getStateByCodeAndCountry(code, cCode)?.name || code;
+    setForm(prev => ({ ...prev, state: stateName, city: '' }));
+  };
 
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpValue, setOtpValue] = useState('');
@@ -195,11 +215,11 @@ export default function SignupPage() {
 
               <form onSubmit={handleSubmit} noValidate className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <FormField id="signup-name" label="Full Name" value={form.name} onChange={handleChange('name')} placeholder="Ramesh Kumar" required autoComplete="name" />
+                  <FormField id="signup-name" label="Full Name" value={form.name} onChange={handleChange('name')} placeholder="Name" required autoComplete="name" />
                   <div className="space-y-1.5">
                     <label htmlFor="signup-phone" className="block text-sm font-medium text-foreground">Phone</label>
                     <div className="flex gap-2">
-                      <Input id="signup-phone" type="tel" value={form.phone} onChange={handleChange('phone')} placeholder="+91 9876543210" autoComplete="tel" className="flex-1" />
+                      <Input id="signup-phone" type="tel" value={form.phone} onChange={handleChange('phone')} placeholder="Mobile Number" autoComplete="tel" className="flex-1" />
                       {form.phone.trim() && !phoneVerified && (
                         <Button type="button" variant="outline" onClick={handleSendOtp} disabled={otpSending} className="flex-shrink-0 text-xs px-3 h-11">
                           {otpSending ? <Loader size={12} className="animate-spin mr-1" /> : <Phone size={12} className="mr-1" />} Verify
@@ -214,7 +234,7 @@ export default function SignupPage() {
                   </div>
                 </div>
 
-                <FormField id="signup-email" label="Email" type="email" value={form.email} onChange={handleChange('email')} placeholder="name@example.com" required autoComplete="email" />
+                <FormField id="signup-email" label="Email" type="email" value={form.email} onChange={handleChange('email')} placeholder="Email Address" required autoComplete="email" />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField id="signup-password" label="Password" type={showPw ? 'text' : 'password'} value={form.password} onChange={handleChange('password')} placeholder="Min 6 characters" required minLength={6} autoComplete="new-password"
@@ -231,14 +251,38 @@ export default function SignupPage() {
                 <div className="border-t border-border/30 pt-5 mt-5">
                   <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-4">Farm Details (Optional)</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <FormField id="signup-city" label="City / Village" value={form.city} onChange={handleChange('city')} placeholder="Nagpur" autoComplete="address-level2" />
-                    <FormField id="signup-state" label="State" value={form.state} onChange={handleChange('state')} placeholder="Maharashtra" autoComplete="address-level1" />
+                    <div className="space-y-1.5">
+                      <label htmlFor="signup-state" className="block text-sm font-medium text-foreground">State</label>
+                      {getCountryCode(form.country) ? (
+                        <select id="signup-state" value={selectedStateCode} onChange={handleStateSelect} className="flex h-11 w-full rounded-xl border border-border/50 bg-background/60 backdrop-blur-sm px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/60 transition-all">
+                          <option value="">Select State</option>
+                          {State.getStatesOfCountry(getCountryCode(form.country)).map(s => (
+                            <option key={s.isoCode} value={s.isoCode}>{s.name}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <Input id="signup-state" value={form.state} onChange={handleChange('state')} placeholder="State" />
+                      )}
+                    </div>
+                    <div className="space-y-1.5">
+                      <label htmlFor="signup-city" className="block text-sm font-medium text-foreground">City / Village</label>
+                      {getCountryCode(form.country) && selectedStateCode ? (
+                        <select id="signup-city" value={form.city} onChange={handleChange('city')} className="flex h-11 w-full rounded-xl border border-border/50 bg-background/60 backdrop-blur-sm px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/60 transition-all">
+                          <option value="">Select City</option>
+                          {City.getCitiesOfState(getCountryCode(form.country), selectedStateCode).map(c => (
+                            <option key={c.name} value={c.name}>{c.name}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <Input id="signup-city" value={form.city} onChange={handleChange('city')} placeholder="City / Village" />
+                      )}
+                    </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                    <FormField id="signup-farm-size" label="Farm Size (acres)" type="number" value={form.farm_size_acres} onChange={handleChange('farm_size_acres')} placeholder="5" />
+                    <FormField id="signup-farm-size" label="Farm Size (acres)" type="number" value={form.farm_size_acres} onChange={handleChange('farm_size_acres')} placeholder="e.g. 5" />
                     <div className="space-y-1.5">
                       <label htmlFor="signup-country" className="block text-sm font-medium text-foreground">Country</label>
-                      <select id="signup-country" value={form.country} onChange={handleChange('country')} className="flex h-11 w-full rounded-xl border border-border/50 bg-background/60 backdrop-blur-sm px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/60 transition-all">
+                      <select id="signup-country" value={form.country} onChange={handleCountryChange} className="flex h-11 w-full rounded-xl border border-border/50 bg-background/60 backdrop-blur-sm px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/60 transition-all">
                         {['India', 'Bangladesh', 'Nepal', 'Sri Lanka', 'Pakistan', 'Other'].map((c) => (<option key={c} value={c}>{c}</option>))}
                       </select>
                     </div>

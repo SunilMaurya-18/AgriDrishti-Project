@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react';
 import toast from 'react-hot-toast';
 import { Loader, User as UserIcon, MapPin, Ruler, CalendarClock, Mail } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import { useAuth, type User } from '@/lib/AuthContext';
 import { authAPI } from '@/lib/api';
+import { State, City } from 'country-state-city';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -20,6 +21,38 @@ export default function ProfilePage() {
   const [state, setState] = useState(user?.farm_location?.state ?? '');
   const [saving, setSaving] = useState(false);
 
+  const [country, setCountry] = useState(user?.farm_location?.country || 'India');
+  const [selectedStateCode, setSelectedStateCode] = useState('');
+
+  const getCountryCode = (name: string) => {
+    const map: Record<string, string> = { 'India': 'IN', 'Bangladesh': 'BD', 'Nepal': 'NP', 'Sri Lanka': 'LK', 'Pakistan': 'PK' };
+    return map[name] || '';
+  };
+
+  useEffect(() => {
+    if (user?.farm_location?.state) {
+      const cCode = getCountryCode(country);
+      const states = State.getStatesOfCountry(cCode);
+      const st = states.find(s => s.name === user?.farm_location?.state);
+      if (st) setSelectedStateCode(st.isoCode);
+    }
+  }, [user, country]);
+
+  const handleCountryChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setCountry(e.target.value);
+    setState('');
+    setCity('');
+    setSelectedStateCode('');
+  };
+
+  const handleStateSelect = (e: ChangeEvent<HTMLSelectElement>) => {
+    const code = e.target.value;
+    setSelectedStateCode(code);
+    const cCode = getCountryCode(country);
+    const stateName = State.getStateByCodeAndCountry(code, cCode)?.name || code;
+    setState(stateName);
+    setCity('');
+  };
 
   const handleSave = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -28,7 +61,7 @@ export default function ProfilePage() {
       const payload = {
         name,
         farm_size_acres: farmSize ? parseFloat(farmSize) : undefined,
-        farm_location: { city: city || undefined, state: state || undefined, country: user?.farm_location?.country || 'India' },
+        farm_location: { city: city || undefined, state: state || undefined, country },
       };
       await authAPI.profile(payload);
       // Update user context with new data
@@ -99,10 +132,40 @@ export default function ProfilePage() {
                 </div>
                 <div className="border-t border-border/20 pt-5 mt-5">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Farm Details</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <Field id="prof-city" label="City" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Pune" />
-                    <Field id="prof-state" label="State" value={state} onChange={(e) => setState(e.target.value)} placeholder="Maharashtra" />
-                    <Field id="prof-size" label="Farm Size (acres)" type="number" value={farmSize} onChange={(e) => setFarmSize(e.target.value)} placeholder="5" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label htmlFor="prof-state" className="block text-sm font-medium text-foreground">State</label>
+                      {getCountryCode(country) ? (
+                        <select id="prof-state" value={selectedStateCode} onChange={handleStateSelect} className="flex h-11 w-full rounded-xl border border-border/50 bg-background/60 backdrop-blur-sm px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/60 transition-all">
+                          <option value="">Select State</option>
+                          {State.getStatesOfCountry(getCountryCode(country)).map(s => (
+                            <option key={s.isoCode} value={s.isoCode}>{s.name}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <Input id="prof-state" value={state} onChange={(e) => setState(e.target.value)} placeholder="State" />
+                      )}
+                    </div>
+                    <div className="space-y-1.5">
+                      <label htmlFor="prof-city" className="block text-sm font-medium text-foreground">City</label>
+                      {getCountryCode(country) && selectedStateCode ? (
+                        <select id="prof-city" value={city} onChange={(e) => setCity(e.target.value)} className="flex h-11 w-full rounded-xl border border-border/50 bg-background/60 backdrop-blur-sm px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/60 transition-all">
+                          <option value="">Select City</option>
+                          {City.getCitiesOfState(getCountryCode(country), selectedStateCode).map(c => (
+                            <option key={c.name} value={c.name}>{c.name}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <Input id="prof-city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" />
+                      )}
+                    </div>
+                    <div className="space-y-1.5">
+                      <label htmlFor="prof-country" className="block text-sm font-medium text-foreground">Country</label>
+                      <select id="prof-country" value={country} onChange={handleCountryChange} className="flex h-11 w-full rounded-xl border border-border/50 bg-background/60 backdrop-blur-sm px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/60 transition-all">
+                        {['India', 'Bangladesh', 'Nepal', 'Sri Lanka', 'Pakistan', 'Other'].map((c) => (<option key={c} value={c}>{c}</option>))}
+                      </select>
+                    </div>
+                    <Field id="prof-size" label="Farm Size (acres)" type="number" value={farmSize} onChange={(e) => setFarmSize(e.target.value)} placeholder="e.g. 5" />
                   </div>
                 </div>
                 <Button type="submit" disabled={saving} className="shadow-lg mt-2 px-6">
