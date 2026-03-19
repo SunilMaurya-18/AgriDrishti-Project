@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://agridrishti-project.onrender.com/api/:path*"
+    },
+    {
+      "source": "/ai/:path*",
+      "destination": "https://agridrishti-project-1.onrender.com/:path*"
+    }
+  ]
+}

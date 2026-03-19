@@ -1,12 +1,19 @@
 import axios, { AxiosError } from 'axios';
 
 // ---------------------------------------------------------------------------
-// Base URL — reads NEXT_PUBLIC_API_URL set in .env.local or Vercel dashboard.
-// Falls back to the Render backend so the app still works without a local .env
+// Base URL — Dynamically detects environment.
+// In the browser, we use relative paths ('') so Vercel rewrites intercept 
+// requests and route them to backend/AI securely under the same domain.
+// On the server (SSR), we use the absolute Render URL.
 // ---------------------------------------------------------------------------
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  'https://prithvicore-project.onrender.com';
+const isBrowser = typeof window !== 'undefined';
+const API_URL = isBrowser 
+  ? '' 
+  : (process.env.NEXT_PUBLIC_API_URL || 'https://agridrishti-project.onrender.com');
+
+export const AI_URL = isBrowser 
+  ? '/ai' 
+  : (process.env.NEXT_PUBLIC_AI_URL || 'https://agridrishti-project-1.onrender.com');
 
 // ---------------------------------------------------------------------------
 // Token helpers — localStorage is only available in the browser.

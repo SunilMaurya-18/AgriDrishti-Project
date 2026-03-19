@@ -45,7 +45,11 @@ app.locals.broadcast = (event, data) => {
 app.use(helmet());
 app.use(cors({
   origin: function (origin, callback) {
-    const allowedOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : [];
+    const allowedOrigins = [
+      'https://prithvicore.com',
+      'https://www.prithvicore.com',
+      ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : [])
+    ];
     if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost:') || origin.includes('vercel.app')) {
       callback(null, origin);
     } else {
