@@ -2,7 +2,7 @@
 
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import toast from 'react-hot-toast';
-import { Loader, Eye, EyeOff, User as UserIcon, MapPin, Ruler, CalendarClock, Mail, Shield } from 'lucide-react';
+import { Loader, User as UserIcon, MapPin, Ruler, CalendarClock, Mail } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import { useAuth, type User } from '@/lib/AuthContext';
 import { authAPI } from '@/lib/api';
@@ -20,11 +20,6 @@ export default function ProfilePage() {
   const [state, setState] = useState(user?.farm_location?.state ?? '');
   const [saving, setSaving] = useState(false);
 
-  const [currentPw, setCurrentPw] = useState('');
-  const [newPw, setNewPw] = useState('');
-  const [confirmPw, setConfirmPw] = useState('');
-  const [changingPw, setChangingPw] = useState(false);
-  const [showPw, setShowPw] = useState(false);
 
   const handleSave = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,21 +43,7 @@ export default function ProfilePage() {
     }
   };
 
-  const handlePwChange = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (newPw.length < 6) { toast.error('Password must be at least 6 characters.'); return; }
-    if (newPw !== confirmPw) { toast.error('Passwords do not match.'); return; }
-    setChangingPw(true);
-    try {
-      await authAPI.password({ current_password: currentPw, new_password: newPw });
-      toast.success('Password changed successfully!');
-      setCurrentPw(''); setNewPw(''); setConfirmPw('');
-    } catch {
-      toast.error('Password change failed. Check current password.');
-    } finally {
-      setChangingPw(false);
-    }
-  };
+
 
   return (
     <AppLayout>
@@ -131,29 +112,7 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-3 border-b border-border/20">
-              <CardTitle className="text-base font-bold flex items-center gap-2"><Shield size={17} className="text-amber-500" /> Change Password</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-5">
-              <form onSubmit={handlePwChange} className="space-y-4">
-                <Field id="prof-cur-pw" label="Current Password" type={showPw ? 'text' : 'password'} value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} required
-                  extra={
-                    <button type="button" onClick={() => setShowPw(!showPw)} className="text-muted-foreground hover:text-foreground transition-colors">
-                      {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
-                    </button>
-                  }
-                />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Field id="prof-new-pw" label="New Password" type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} required minLength={6} placeholder="Min 6 characters" />
-                  <Field id="prof-confirm-pw" label="Confirm Password" type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} required />
-                </div>
-                <Button type="submit" disabled={changingPw} className="shadow-lg px-6 bg-gradient-to-r from-amber-500 to-orange-500 hover:shadow-amber-500/20">
-                  {changingPw ? <><Loader size={14} className="animate-spin mr-2" /> Updating…</> : 'Update Password'}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+
         </div>
       </div>
     </AppLayout>
