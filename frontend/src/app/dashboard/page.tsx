@@ -101,9 +101,9 @@ export default function DashboardPage() {
             Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'},{' '}
             <span className="text-gradient">{user?.name?.split(' ')[0] ?? 'Farmer'}</span> 👋
           </h1>
-          <p className="text-muted-foreground mt-1 text-sm flex items-center gap-2">
+          <p className="text-foreground/60 dark:text-foreground/70 mt-1 text-sm flex items-center gap-2">
             {user?.farm_location?.city ? `📍 ${user.farm_location.city}, ${user.farm_location.state ?? ''}` : 'Farm overview'}
-            <span className="text-border">·</span> {format(new Date(), 'EEEE, MMMM d')}
+            <span className="text-emerald-500/40">·</span> {format(new Date(), 'EEEE, MMMM d')}
           </p>
         </div>
         <Button variant="outline" onClick={() => qc.invalidateQueries('dashboard')} className="gap-2 font-medium shadow-sm rounded-xl" disabled={isLoading}>
@@ -118,7 +118,7 @@ export default function DashboardPage() {
       )}
 
       {dataUpdatedAt > 0 && (
-        <p className="text-[11px] uppercase tracking-widest text-muted-foreground mb-5 font-semibold flex items-center gap-2">
+        <p className="text-[11px] uppercase tracking-widest text-foreground/50 dark:text-foreground/60 mb-5 font-semibold flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           Last sync: {formatDistanceToNow(dataUpdatedAt, { addSuffix: true })}
           {s?.timestamp && (<><span className="w-1 h-1 rounded-full bg-border" /><span>Sensor: {formatDistanceToNow(new Date(s.timestamp), { addSuffix: true })}</span></>)}
@@ -154,18 +154,18 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
           <motion.div variants={itemV} className="space-y-5 h-full">
-            <Card className="overflow-hidden relative h-full">
+            <Card className="overflow-hidden relative h-full dark:ring-1 dark:ring-emerald-500/10">
               <CardHeader className="pb-2 border-b border-border/20">
-                <CardTitle className="text-base flex items-center gap-2"><Activity size={17} className="text-emerald-500" /> Soil Insights</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2"><Activity size={17} className="text-emerald-500" /> <span className="text-foreground">Soil Insights</span></CardTitle>
               </CardHeader>
               <CardContent className="pt-5">
                 <div className="grid grid-cols-1 gap-7">
                   <div>
-                    <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">7-Day Trend</h4>
+                    <h4 className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-3">7-Day Trend</h4>
                     {isLoading ? <Skeleton className="h-[200px] w-full" /> : wkly.length > 0 ? <SoilTrendChart data={wkly} height={200} /> : <EmptyChart message="Sensor history will appear here" />}
                   </div>
                   <div>
-                    <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Nutrient Flow (NPK)</h4>
+                    <h4 className="text-[11px] font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider mb-3">Nutrient Flow (NPK)</h4>
                     {isLoading ? <Skeleton className="h-[200px] w-full" /> : wkly.length > 0 ? <NPKChart data={wkly} height={200} /> : <EmptyChart message="NPK history will appear here" />}
                   </div>
                 </div>
@@ -181,9 +181,9 @@ export default function DashboardPage() {
         {/* Recs and Disease */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <motion.div variants={itemV}>
-            <Card className="h-full">
+            <Card className="h-full dark:ring-1 dark:ring-emerald-500/10">
               <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0 border-b border-border/20">
-                <CardTitle className="text-base flex items-center gap-2 font-bold"><Lightbulb size={17} className="text-amber-500" /> AI Recommendations</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2 font-bold"><Lightbulb size={17} className="text-amber-500" /> <span className="text-foreground">AI Recommendations</span></CardTitle>
                 <Link href="/recommendations" className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-semibold px-3 py-1 rounded-full bg-emerald-500/10 transition-colors hover:bg-emerald-500/20">View All</Link>
               </CardHeader>
               <CardContent className="pt-4">
@@ -221,9 +221,9 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div variants={itemV}>
-            <Card className="h-full relative overflow-hidden group">
+            <Card className="h-full relative overflow-hidden group dark:ring-1 dark:ring-emerald-500/10">
               <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0 border-b border-border/20 relative z-10">
-                <CardTitle className="text-base flex items-center gap-2 font-bold"><Bug size={17} className="text-red-500" /> Plant Pathology</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2 font-bold"><Bug size={17} className="text-red-500" /> <span className="text-foreground">Plant Pathology</span></CardTitle>
                 <Link href="/disease" className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-semibold px-3 py-1 rounded-full bg-emerald-500/10 transition-colors hover:bg-emerald-500/20">Run Scan</Link>
               </CardHeader>
               <CardContent className="pt-4 relative z-10">

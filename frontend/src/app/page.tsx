@@ -19,15 +19,15 @@ function LandingNavbar() {
           </div>
           <span className="text-lg font-bold tracking-tight text-foreground hidden sm:block">PrithviCore</span>
         </div>
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-          <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-          <a href="#how-it-works" className="hover:text-foreground transition-colors">How it Works</a>
-          <a href="#use-cases" className="hover:text-foreground transition-colors">Use Cases</a>
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-foreground/70 dark:text-foreground/80">
+          <a href="#features" className="hover:text-foreground hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">Features</a>
+          <a href="#how-it-works" className="hover:text-foreground hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">How it Works</a>
+          <a href="#use-cases" className="hover:text-foreground hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">Use Cases</a>
         </div>
         <div className="flex items-center gap-3">
           <ThemeToggle />
           <Link href="/login">
-            <Button variant="ghost" className="font-medium hidden sm:inline-flex text-sm">Sign In</Button>
+            <Button variant="outline" className="font-medium hidden sm:inline-flex text-sm border-border/50 dark:border-emerald-500/30 dark:text-emerald-400">Sign In</Button>
           </Link>
           <Link href="/signup">
             <Button className="font-semibold rounded-full px-5 text-sm shadow-lg shadow-emerald-500/20">
@@ -54,7 +54,7 @@ function HeroSection() {
       <motion.div initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-4xl mx-auto z-10">
         {/* Badge */}
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 mb-8 rounded-full border border-border/40 bg-background/60 backdrop-blur-sm text-sm font-medium text-muted-foreground shadow-sm">
+          className="inline-flex items-center gap-2 px-4 py-1.5 mb-8 rounded-full border border-emerald-500/20 dark:border-emerald-500/30 bg-emerald-500/5 backdrop-blur-sm text-sm font-semibold text-emerald-700 dark:text-emerald-300 shadow-sm">
           <Zap size={14} className="text-emerald-500" />
           <span>AI-Powered Smart Farming Platform</span>
         </motion.div>
@@ -65,7 +65,7 @@ function HeroSection() {
             Modern Agriculture
           </span>
         </h1>
-        <p className="text-base md:text-lg text-muted-foreground mb-10 max-w-2xl mx-auto font-medium leading-relaxed">
+        <p className="text-base md:text-lg text-foreground/60 dark:text-foreground/70 mb-10 max-w-2xl mx-auto font-medium leading-relaxed">
           Transform your farm into a premium, scalable eco-tech ecosystem. Harness real-time soil analytics, AI disease scanning, and actionable insights — all in one platform.
         </p>
         
@@ -180,7 +180,7 @@ function HeroSection() {
 
       {/* Trust Badges */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
-        className="mt-16 flex flex-wrap items-center justify-center gap-6 text-xs font-medium text-muted-foreground/60">
+        className="mt-16 flex flex-wrap items-center justify-center gap-6 text-xs font-semibold text-foreground/50 dark:text-foreground/60">
         {[
           { icon: Lock, text: 'SSL Encrypted' },
           { icon: Globe, text: 'Cloud Hosted' },
@@ -213,17 +213,17 @@ function FeaturesSection() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-foreground mb-4">Enterprise Grade Tools</h2>
-          <p className="text-muted-foreground text-base md:text-lg">Everything you need to supervise, analyze, and automate your farming pipeline.</p>
+          <p className="text-foreground/60 dark:text-foreground/70 text-base md:text-lg">Everything you need to supervise, analyze, and automate your farming pipeline.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {features.map((f, i) => (
-            <motion.div key={i} whileHover={{ y: -4 }} className="bg-background/60 backdrop-blur-sm border border-border/30 p-7 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 group ring-1 ring-white/5 dark:ring-white/[0.02]">
+            <motion.div key={i} whileHover={{ y: -4 }} className="bg-card/80 dark:bg-card/60 backdrop-blur-sm border border-border/30 dark:border-emerald-500/10 p-7 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 dark:hover:shadow-emerald-500/20 transition-all duration-300 group ring-1 ring-white/5 dark:ring-emerald-500/5">
               <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center text-white mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                 <f.icon strokeWidth={2} size={22} />
               </div>
               <h3 className="text-lg font-bold text-foreground mb-2 tracking-tight">{f.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p>
+              <p className="text-foreground/60 dark:text-foreground/70 text-sm leading-relaxed">{f.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -248,7 +248,7 @@ function HowItWorks() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-foreground mb-4">How It Works</h2>
-          <p className="text-muted-foreground max-w-lg mx-auto">Four simple steps to transform your farm into a smart ecosystem.</p>
+          <p className="text-foreground/60 dark:text-foreground/70 max-w-lg mx-auto">Four simple steps to transform your farm into a smart ecosystem.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
@@ -262,7 +262,7 @@ function HowItWorks() {
               </div>
               <div className="text-xs font-black text-emerald-500 uppercase tracking-widest mb-2">{s.num}</div>
               <h3 className="text-lg font-bold text-foreground mb-1.5">{s.title}</h3>
-              <p className="text-muted-foreground text-sm">{s.desc}</p>
+              <p className="text-foreground/60 dark:text-foreground/70 text-sm">{s.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -290,7 +290,7 @@ function StatsSection() {
             <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
               className="text-center">
               <div className="text-3xl md:text-4xl font-black text-gradient mb-1">{s.value}</div>
-              <div className="text-sm text-muted-foreground font-medium">{s.label}</div>
+              <div className="text-sm text-foreground/60 dark:text-foreground/70 font-medium">{s.label}</div>
             </motion.div>
           ))}
         </div>
@@ -315,7 +315,7 @@ function UseCases() {
         <div className="flex flex-col md:flex-row gap-12 items-center">
           <div className="md:w-1/3">
             <h2 className="text-3xl md:text-5xl font-black tracking-tight text-foreground mb-5 leading-[1.1]">Built for Every Scale</h2>
-            <p className="text-muted-foreground text-base mb-8">From modest family plots to expansive automated greenhouses, PrithviCore dynamically scales with your canopy.</p>
+            <p className="text-foreground/60 dark:text-foreground/70 text-base mb-8">From modest family plots to expansive automated greenhouses, PrithviCore dynamically scales with your canopy.</p>
             <Link href="/signup">
               <Button className="rounded-full shadow-xl font-semibold px-7 py-5 text-sm group">
                 Create Account <ChevronRight className="ml-1.5 group-hover:translate-x-1 transition-transform" size={16} />
@@ -324,12 +324,12 @@ function UseCases() {
           </div>
           <div className="md:w-2/3 grid grid-cols-1 sm:grid-cols-3 gap-5">
              {cases.map((c, i) => (
-               <motion.div key={i} whileHover={{ y: -4 }} className="bg-background/60 backdrop-blur-sm rounded-2xl p-6 border border-border/30 shadow-sm hover:shadow-lg transition-all duration-300 ring-1 ring-white/5">
+               <motion.div key={i} whileHover={{ y: -4 }} className="bg-card/80 dark:bg-card/60 backdrop-blur-sm rounded-2xl p-6 border border-border/30 dark:border-emerald-500/10 shadow-sm hover:shadow-lg dark:hover:shadow-emerald-500/10 transition-all duration-300 ring-1 ring-white/5 dark:ring-emerald-500/5">
                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500/15 to-teal-500/15 flex items-center justify-center text-emerald-500 mb-4">
                    <c.icon size={22} />
                  </div>
                  <h4 className="font-bold text-foreground text-base mb-2">{c.title}</h4>
-                 <p className="text-sm text-muted-foreground leading-relaxed">{c.desc}</p>
+                 <p className="text-sm text-foreground/60 dark:text-foreground/70 leading-relaxed">{c.desc}</p>
                </motion.div>
              ))}
           </div>
@@ -352,7 +352,7 @@ function Footer() {
           </div>
           <span className="text-base font-bold tracking-tight text-foreground">PrithviCore</span>
         </div>
-        <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} PrithviCore Industries. All rights reserved.</p>
+        <p className="text-sm text-foreground/50 dark:text-foreground/60">© {new Date().getFullYear()} PrithviCore Industries. All rights reserved.</p>
       </div>
     </footer>
   );

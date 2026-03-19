@@ -152,7 +152,7 @@ export default function SignupPage() {
             <Leaf size={32} className="text-white" />
           </div>
           <h2 className="text-3xl font-black text-white tracking-tight mb-4">Join PrithviCore</h2>
-          <p className="text-white/50 text-sm leading-relaxed">Start monitoring your farm with real-time IoT data, AI disease detection, and automated recommendations.</p>
+          <p className="text-white/70 text-sm leading-relaxed">Start monitoring your farm with real-time IoT data, AI disease detection, and automated recommendations.</p>
           
           <div className="mt-12 grid grid-cols-5 gap-3 max-w-[200px] mx-auto opacity-20">
             {[...Array(15)].map((_, i) => (
@@ -164,7 +164,7 @@ export default function SignupPage() {
 
       {/* Form Right Panel */}
       <div className="flex-1 flex items-center justify-center p-6 py-12 relative overflow-y-auto">
-        <Link href="/" className="fixed top-6 left-6 lg:left-auto lg:right-6 text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium transition-colors z-50 bg-background/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-border/30">
+        <Link href="/" className="fixed top-6 left-6 lg:left-auto lg:right-6 text-foreground/70 dark:text-foreground/80 hover:text-foreground flex items-center gap-2 text-sm font-medium transition-colors z-50 bg-background/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-border/30 dark:border-emerald-500/20">
           <ArrowLeft size={14} /> Home
         </Link>
 
@@ -178,19 +178,19 @@ export default function SignupPage() {
               <Leaf size={26} className="text-white" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground">Join PrithviCore</h1>
-            <p className="text-muted-foreground mt-1.5 text-sm">Start monitoring your farm with real-time IoT data</p>
+            <p className="text-foreground/60 dark:text-foreground/70 mt-1.5 text-sm">Start monitoring your farm with real-time IoT data</p>
           </div>
 
-          <Card className="shadow-2xl shadow-emerald-500/5 rounded-2xl overflow-hidden">
+          <Card className="shadow-2xl shadow-emerald-500/5 dark:shadow-emerald-500/10 rounded-2xl overflow-hidden dark:ring-1 dark:ring-emerald-500/10">
             <CardContent className="p-8 sm:p-10">
               <div className="mb-5">
                 <ClientGoogleLogin onSuccess={handleGoogleSuccess} onError={() => toast.error('Google sign-up failed')} text="Sign up with Google" />
               </div>
 
               <div className="flex items-center gap-3 my-7">
-                <div className="flex-1 h-px bg-border/50" />
-                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider px-2">Or continue with email</span>
-                <div className="flex-1 h-px bg-border/50" />
+                <div className="flex-1 h-px bg-border/50 dark:bg-emerald-500/15" />
+                <span className="text-xs text-foreground/50 dark:text-foreground/60 font-semibold uppercase tracking-wider px-2">Or continue with email</span>
+                <div className="flex-1 h-px bg-border/50 dark:bg-emerald-500/15" />
               </div>
 
               <form onSubmit={handleSubmit} noValidate className="space-y-5">
@@ -219,7 +219,7 @@ export default function SignupPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField id="signup-password" label="Password" type={showPw ? 'text' : 'password'} value={form.password} onChange={handleChange('password')} placeholder="Min 6 characters" required minLength={6} autoComplete="new-password"
                     extra={
-                      <button type="button" onClick={toggleShowPw} className="text-muted-foreground hover:text-foreground transition-colors">
+                      <button type="button" onClick={toggleShowPw} className="text-foreground/50 dark:text-foreground/60 hover:text-foreground transition-colors">
                         {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
                       </button>
                     }
@@ -229,7 +229,7 @@ export default function SignupPage() {
 
                 {/* Farm details */}
                 <div className="border-t border-border/30 pt-5 mt-5">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Farm Details (Optional)</p>
+                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-4">Farm Details (Optional)</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormField id="signup-city" label="City / Village" value={form.city} onChange={handleChange('city')} placeholder="Nagpur" autoComplete="address-level2" />
                     <FormField id="signup-state" label="State" value={form.state} onChange={handleChange('state')} placeholder="Maharashtra" autoComplete="address-level1" />

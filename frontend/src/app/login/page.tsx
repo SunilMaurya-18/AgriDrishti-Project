@@ -80,7 +80,7 @@ export default function LoginPage() {
             <Leaf size={32} className="text-white" />
           </div>
           <h2 className="text-3xl font-black text-white tracking-tight mb-4">Welcome to PrithviCore</h2>
-          <p className="text-white/50 text-sm leading-relaxed">The intelligent operating system for modern agriculture. Monitor, analyze, and optimize your farm with real-time IoT data and AI insights.</p>
+          <p className="text-white/70 text-sm leading-relaxed">The intelligent operating system for modern agriculture. Monitor, analyze, and optimize your farm with real-time IoT data and AI insights.</p>
           
           {/* Decorative grid dots */}
           <div className="mt-12 grid grid-cols-5 gap-3 max-w-[200px] mx-auto opacity-20">
@@ -93,7 +93,7 @@ export default function LoginPage() {
 
       {/* Form Right Panel */}
       <div className="flex-1 flex items-center justify-center p-6 relative">
-        <Link href="/" className="absolute top-6 left-6 text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium transition-colors z-50 bg-background/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-border/30">
+        <Link href="/" className="absolute top-6 left-6 text-foreground/70 dark:text-foreground/80 hover:text-foreground flex items-center gap-2 text-sm font-medium transition-colors z-50 bg-background/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-border/30 dark:border-emerald-500/20">
           <ArrowLeft size={14} /> Home
         </Link>
 
@@ -110,10 +110,10 @@ export default function LoginPage() {
             <h1 className="text-2xl font-bold tracking-tight text-foreground">PrithviCore</h1>
           </div>
 
-          <Card className="shadow-2xl shadow-emerald-500/5 rounded-2xl overflow-hidden">
+          <Card className="shadow-2xl shadow-emerald-500/5 dark:shadow-emerald-500/10 rounded-2xl overflow-hidden dark:ring-1 dark:ring-emerald-500/10">
             <CardContent className="p-8">
               <h2 className="text-2xl font-bold tracking-tight mb-1.5 text-foreground">Welcome back</h2>
-              <p className="text-sm text-muted-foreground mb-7">Sign in to your farm dashboard</p>
+              <p className="text-sm text-foreground/60 dark:text-foreground/70 mb-7">Sign in to your farm dashboard</p>
 
               {/* Google */}
               <div className="mb-5">
@@ -125,9 +125,9 @@ export default function LoginPage() {
               </div>
 
               <div className="flex items-center gap-3 my-6">
-                <div className="flex-1 h-px bg-border/50" />
-                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Or</span>
-                <div className="flex-1 h-px bg-border/50" />
+                <div className="flex-1 h-px bg-border/50 dark:bg-emerald-500/15" />
+                <span className="text-xs text-foreground/50 dark:text-foreground/60 font-semibold uppercase tracking-wider">Or</span>
+                <div className="flex-1 h-px bg-border/50 dark:bg-emerald-500/15" />
               </div>
 
               <form onSubmit={handleSubmit} noValidate className="space-y-4">
@@ -143,7 +143,7 @@ export default function LoginPage() {
                   </label>
                   <div className="relative">
                     <Input id="login-password" type={showPw ? 'text' : 'password'} autoComplete="current-password" value={password} onChange={handlePasswordChange} required placeholder="••••••••" className="pr-10" />
-                    <button type="button" onClick={toggleShowPw} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                    <button type="button" onClick={toggleShowPw} className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 dark:text-foreground/60 hover:text-foreground transition-colors">
                       {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
@@ -154,9 +154,9 @@ export default function LoginPage() {
                 </Button>
               </form>
 
-              <p className="mt-7 text-center text-sm text-muted-foreground">
+              <p className="mt-7 text-center text-sm text-foreground/60 dark:text-foreground/70">
                 Don&apos;t have an account?{' '}
-                <Link href="/signup" className="text-primary font-semibold hover:underline">Sign up free</Link>
+                <Link href="/signup" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">Sign up free</Link>
               </p>
             </CardContent>
           </Card>

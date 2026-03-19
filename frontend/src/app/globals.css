@@ -45,38 +45,38 @@
   }
 
   .dark {
-    --background: #050d09;
-    --foreground: #f0fdf4;
+    --background: #030a06;
+    --foreground: #ecfdf5;
 
-    --card: #0c1a12;
-    --card-foreground: #f0fdf4;
+    --card: #0a1f14;
+    --card-foreground: #ecfdf5;
 
-    --popover: #0c1a12;
-    --popover-foreground: #f0fdf4;
+    --popover: #0a1f14;
+    --popover-foreground: #ecfdf5;
 
     --primary: #34d399;
     --primary-foreground: #022c22;
 
-    --secondary: #0d2818;
+    --secondary: #0f2d1c;
     --secondary-foreground: #a7f3d0;
 
-    --muted: #162520;
-    --muted-foreground: #94a3b8;
+    --muted: #132b1f;
+    --muted-foreground: #b8c5d3;
 
-    --accent: #0d3320;
+    --accent: #0f3524;
     --accent-foreground: #a7f3d0;
 
     --destructive: #f87171;
     --destructive-foreground: #1c1917;
 
-    --border: #1e3a2a;
-    --input: #1e3a2a;
+    --border: #1a3d2b;
+    --input: #1a3d2b;
     --ring: #34d399;
 
-    --glow-primary: rgba(52, 211, 153, 0.12);
-    --glow-accent: rgba(6, 182, 212, 0.08);
-    --glass-bg: rgba(12, 26, 18, 0.6);
-    --glass-border: rgba(52, 211, 153, 0.08);
+    --glow-primary: rgba(52, 211, 153, 0.18);
+    --glow-accent: rgba(6, 182, 212, 0.14);
+    --glass-bg: rgba(10, 31, 20, 0.75);
+    --glass-border: rgba(52, 211, 153, 0.12);
   }
 }
 
@@ -89,6 +89,14 @@
     font-family: var(--font-inter), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Improve placeholder contrast in dark mode */
+  .dark input::placeholder,
+  .dark textarea::placeholder,
+  .dark select::placeholder {
+    color: #6b8a7a !important;
+    opacity: 1;
   }
 }
 
@@ -117,7 +125,7 @@
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, var(--primary), #06b6d4, #8b5cf6);
+    background: linear-gradient(135deg, #34d399, #06b6d4, #a78bfa);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -127,8 +135,14 @@
     background: 
       radial-gradient(ellipse at 20% 50%, var(--glow-primary) 0%, transparent 50%),
       radial-gradient(ellipse at 80% 20%, var(--glow-accent) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+      radial-gradient(ellipse at 50% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
   }
+
+  /* Colorful accent borders for dark mode sections */
+  .dark .border-glow-emerald { border-color: rgba(52, 211, 153, 0.3); }
+  .dark .border-glow-cyan    { border-color: rgba(6, 182, 212, 0.3); }
+  .dark .border-glow-violet  { border-color: rgba(139, 92, 246, 0.3); }
+  .dark .border-glow-amber   { border-color: rgba(245, 158, 11, 0.3); }
 }
 
 /* ── Scrollbar ─────────────────────────────────────────────── */
