@@ -140,58 +140,6 @@ PrithviCore/
 5. Flash to ESP32
 
 ---
-
-## 🔌 API Reference
-
-### Authentication
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/api/auth/signup` | — | Create account (name, email, password, farm details) |
-| `POST` | `/api/auth/login` | — | Login with email + password, returns JWT |
-| `POST` | `/api/auth/google` | — | Google OAuth login/signup |
-| `GET` | `/api/auth/me` | JWT | Get current user profile |
-| `PUT` | `/api/auth/profile` | JWT | Update name, farm location, farm size |
-| `PUT` | `/api/auth/password` | JWT | Change password |
-| `POST` | `/api/auth/send-otp` | — | Send OTP to phone number |
-| `POST` | `/api/auth/verify-otp` | JWT | Verify phone OTP |
-
-### Sensor Data
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/api/sensor-data` | API Key | ESP32 pushes sensor readings |
-| `GET` | `/api/soil/latest` | JWT | Latest sensor reading |
-| `GET` | `/api/soil/history` | JWT | Historical data with daily averages |
-| `GET` | `/api/sensor/stats` | JWT | 24h aggregated statistics |
-
-### Disease Detection
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/api/disease-detection` | JWT | Upload leaf image → AI prediction |
-| `GET` | `/api/disease-history` | JWT | Past scan results (paginated) |
-
-### Dashboard & Intelligence
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/dashboard` | JWT | Full dashboard (stats, trends, recommendations) |
-| `GET` | `/api/recommendations` | JWT | Farming recommendations from sensor data |
-| `GET` | `/api/weather` | JWT | Weather data from OpenWeatherMap |
-| `GET` | `/api/reports` | JWT | Farm report data |
-| `GET` | `/api/reports/download` | JWT | Download PDF report |
-
-### AI Service (Internal)
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/predict` | JWT | Image → disease prediction (called by backend) |
-| `GET` | `/health` | — | Service health check |
-| `GET` | `/classes` | — | List all 38 disease classes |
-
----
-
 ## 🧠 AI Disease Detection
 
 ### Model
