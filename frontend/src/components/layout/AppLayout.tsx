@@ -79,7 +79,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <div className="md:ml-[260px] flex flex-col min-h-screen w-full md:w-[calc(100%-260px)] transition-all">
         <Navbar alerts={alerts} />
         
-        <main className="flex-1 p-5 md:p-8 animate-fade-in">
+        <main className="flex-1 p-5 md:p-8">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>

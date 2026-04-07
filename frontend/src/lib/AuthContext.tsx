@@ -10,6 +10,30 @@ import {
 import { authAPI, tokenHelpers, type SignupPayload } from './api';
 
 // ---------------------------------------------------------------------------
+// User cache — stores user object in localStorage for instant rehydration
+// ---------------------------------------------------------------------------
+const USER_CACHE_KEY = 'prithvi_user';
+const userCache = {
+  get: (): User | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const raw = localStorage.getItem(USER_CACHE_KEY);
+      return raw ? (JSON.parse(raw) as User) : null;
+    } catch {
+      return null;
+    }
+  },
+  set: (u: User): void => {
+    if (typeof window === 'undefined') return;
+    try { localStorage.setItem(USER_CACHE_KEY, JSON.stringify(u)); } catch { /* noop */ }
+  },
+  remove: (): void => {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(USER_CACHE_KEY);
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 export interface User {
@@ -49,26 +73,35 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 // Provider
 // ---------------------------------------------------------------------------
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user,    setUser]    = useState<User | null>(null);
-  const [token,   setToken]   = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user,    setUser]    = useState<User | null>(() => userCache.get());
+  const [token,   setToken]   = useState<string | null>(() => tokenHelpers.get());
+  // Start loading=false if we already have a cached user so the app shows instantly
+  const [loading, setLoading] = useState(() => !userCache.get() && !!tokenHelpers.get());
 
-  // Rehydrate session from localStorage on first mount (client-only)
+  // Rehydrate & verify session on first mount (client-only)
   useEffect(() => {
     const saved = tokenHelpers.get();
     if (!saved) {
       setLoading(false);
+      userCache.remove();
       return;
     }
 
-    setToken(saved);
+    // If we already loaded a cached user, verify silently in the background
+    // (don't block the UI with a loading spinner)
     authAPI
       .me()
-      .then((res) => setUser(res.data.user as User))
+      .then((res) => {
+        const freshUser = res.data.user as User;
+        setUser(freshUser);
+        userCache.set(freshUser);
+      })
       .catch(() => {
-        // Token is invalid / expired — clean up
+        // Token is invalid / expired — clean up everything
         tokenHelpers.remove();
+        userCache.remove();
         setToken(null);
+        setUser(null);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -78,6 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await authAPI.login({ email, password });
     const { token: t, user: u } = res.data as { token: string; user: User };
     tokenHelpers.set(t);
+    userCache.set(u);
     setToken(t);
     setUser(u);
   };
@@ -86,6 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await authAPI.signup(data);
     const { token: t, user: u } = res.data as { token: string; user: User };
     tokenHelpers.set(t);
+    userCache.set(u);
     setToken(t);
     setUser(u);
   };
@@ -94,12 +129,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await authAPI.googleLogin(credential);
     const { token: t, user: u } = res.data as { token: string; user: User };
     tokenHelpers.set(t);
+    userCache.set(u);
     setToken(t);
     setUser(u);
   };
 
   const logout = (): void => {
     tokenHelpers.remove();
+    userCache.remove();
     setToken(null);
     setUser(null);
     // Hard redirect so all query caches and state are cleared
