@@ -2,12 +2,12 @@
 
 import { useCallback, useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from 'react-query';
+import dynamic from 'next/dynamic';
 import { dashboardAPI } from '@/lib/api';
 import { useAuth } from '@/lib/AuthContext';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import AppLayout from '@/components/layout/AppLayout';
 import SensorCard from '@/components/ui/SensorCard';
-import { SoilTrendChart, NPKChart } from '@/components/charts/SoilChart';
 import { formatDistanceToNow, format } from 'date-fns';
 import { Droplets, Wind, Bug, Lightbulb, RefreshCw, Cloud, Activity, Settings, MapPin, Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -16,6 +16,16 @@ import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+
+// ── Lazy-load heavy chart components — excluded from initial bundle ────────────
+const SoilTrendChart = dynamic(
+  () => import('@/components/charts/SoilChart').then(m => ({ default: m.SoilTrendChart })),
+  { ssr: false, loading: () => <Skeleton className="h-[200px] w-full" /> }
+);
+const NPKChart = dynamic(
+  () => import('@/components/charts/SoilChart').then(m => ({ default: m.NPKChart })),
+  { ssr: false, loading: () => <Skeleton className="h-[200px] w-full" /> }
+);
 
 interface SensorReading { moisture: number; temperature: number; humidity: number; ph: number; nitrogen: number; phosphorus: number; potassium: number; timestamp: string; }
 interface Recommendation { id: string; icon: string; title: string; action: string; priority: string; }
@@ -83,7 +93,17 @@ export default function DashboardPage() {
     { enabled: !!coords, refetchInterval: 10 * 60_000, staleTime: 5 * 60_000, retry: 2 }
   );
 
-  const wsHandler = useCallback((msg: { event: string }) => { if (msg.event === 'sensor_update') qc.invalidateQueries('dashboard'); }, [qc]);
+  // ── Optimistic WebSocket updates ─────────────────────────────────────────
+  // Instead of refetching the entire dashboard, inject the fresh sensor reading
+  // directly into the query cache — zero latency, zero extra network requests.
+  const wsHandler = useCallback((msg: { event: string; data?: unknown }) => {
+    if (msg.event === 'sensor_update' && msg.data) {
+      qc.setQueryData<DashboardData>('dashboard', (old) => {
+        if (!old) return old!;
+        return { ...old, latest_reading: msg.data as SensorReading };
+      });
+    }
+  }, [qc]);
   useWebSocket(wsHandler);
 
   const s = dash?.latest_reading ?? null;

@@ -2,14 +2,26 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { OAuth2Client } = require('google-auth-library');
+const rateLimit = require('express-rate-limit');
 const User = require('../models/User');
 const OTP = require('../models/OTP');
 const { protect, signToken } = require('../middleware/auth');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// ─── Auth-specific brute-force limiter ───────────────────────────────────────
+// Only 5 attempts per IP per 15 minutes on sensitive auth routes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  skipSuccessfulRequests: true, // Don't count successful logins
+  message: { error: 'Too many login attempts. Please try again in 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // ─── POST /api/auth/signup ───────────────────────────────
-router.post('/signup', [
+router.post('/signup', authLimiter, [
   body('name').trim().notEmpty().withMessage('Name is required'),
   body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -51,7 +63,7 @@ router.post('/signup', [
 });
 
 // ─── POST /api/auth/login ────────────────────────────────
-router.post('/login', [
+router.post('/login', authLimiter, [
   body('email').isEmail().normalizeEmail(),
   body('password').notEmpty(),
 ], async (req, res) => {
@@ -84,6 +96,7 @@ router.post('/login', [
     res.status(500).json({ error: 'Login failed' });
   }
 });
+
 
 // ─── GET /api/auth/me ────────────────────────────────────
 router.get('/me', protect, async (req, res) => {

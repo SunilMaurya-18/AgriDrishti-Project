@@ -272,6 +272,24 @@ async def predict(request: Request, file: UploadFile = File(...), user: dict = D
         name, treatment, severity = TREATMENTS.get(class_key, DEFAULT_TREATMENT)
         crop_type = class_key.split("___")[0]
 
+        # ── Confidence threshold: avoid false positives ───────────────────────
+        # If confidence < 60%, return a "low confidence" response instead of
+        # potentially wrong diagnosis which could lead farmers to wrong treatment.
+        CONFIDENCE_THRESHOLD = 0.60
+        if confidence < CONFIDENCE_THRESHOLD:
+            ms = round((time.time() - start_time) * 1000, 1)
+            logger.info(f"Low confidence prediction ({confidence:.2%}) — returning no_disease_detected")
+            return PredictionResponse(
+                disease="No Disease Detected",
+                confidence=confidence,
+                severity="none",
+                treatment="Image quality may be too low or no recognizable disease pattern found. Ensure the leaf is clearly visible and try again with a closer photo.",
+                crop_type=crop_type if crop_type else "Unknown",
+                affected_area_percent=0.0,
+                model_version=model_mgr.model_version,
+                processing_time_ms=ms,
+            )
+
         # Estimate affected area from pixel heuristic (simplified)
         arr = np.array(image.resize((128, 128)))
         brown_mask = (arr[:,:,0] > 100) & (arr[:,:,1] < 80) & (arr[:,:,2] < 80)

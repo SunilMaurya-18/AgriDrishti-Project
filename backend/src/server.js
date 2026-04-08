@@ -52,11 +52,19 @@ app.use(cors({
       'https://www.prithvicore.com',
       ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : [])
     ];
-    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost:') || origin.includes('vercel.app')) {
-      callback(null, origin);
-    } else {
-      callback(null, true); // Fallback to allow during dev/deployment, restrict in strict prod
+    // Allow requests with no origin (mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    // Always allow localhost in development
+    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) return callback(null, true);
+    // Allow Vercel preview deployments
+    if (origin.includes('.vercel.app')) return callback(null, true);
+    // Allow explicit allowlist
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    // In production: reject unknown origins. In dev: allow (for tools like Postman).
+    if (process.env.NODE_ENV === 'production') {
+      return callback(new Error(`CORS: origin ${origin} not allowed`));
     }
+    return callback(null, true);
   },
   credentials: true,
 }));
