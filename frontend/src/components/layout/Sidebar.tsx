@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Leaf, Bug, Lightbulb,
-  FileBarChart, Settings, User,
+  FileBarChart, Settings, User, MessageSquarePlus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -17,8 +17,9 @@ const NAV_ITEMS = [
 ];
 
 const BOTTOM_ITEMS = [
-  { href: '/settings', label: 'Settings', icon: Settings },
-  { href: '/profile',  label: 'Profile',  icon: User },
+  { href: '/feedback', label: 'Feedback',  icon: MessageSquarePlus },
+  { href: '/settings', label: 'Settings',  icon: Settings },
+  { href: '/profile',  label: 'Profile',   icon: User },
 ];
 
 export default function Sidebar() {

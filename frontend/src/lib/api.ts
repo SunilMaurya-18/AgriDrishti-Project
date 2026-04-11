@@ -145,5 +145,17 @@ export const reportsAPI = {
     }),
 };
 
+export interface FeedbackPayload {
+  category: 'bug' | 'feature' | 'improvement' | 'general';
+  rating: number;
+  subject: string;
+  message: string;
+}
+
+export const feedbackAPI = {
+  submit: (data: FeedbackPayload) => api.post('/feedback', data),
+  history: ()                     => api.get('/feedback'),
+};
+
 export default api;
 

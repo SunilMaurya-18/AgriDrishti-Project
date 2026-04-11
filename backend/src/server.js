@@ -20,6 +20,7 @@ const diseaseRoutes = require('./routes/disease');
 const recommendationRoutes = require('./routes/recommendations');
 const reportRoutes = require('./routes/reports');
 const weatherRoutes = require('./routes/weather');
+const feedbackRoutes = require('./routes/feedback');
 
 const app = express();
 const server = http.createServer(app);
@@ -106,6 +107,7 @@ app.use('/api', diseaseRoutes);
 app.use('/api', recommendationRoutes);
 app.use('/api', reportRoutes);
 app.use('/api', weatherRoutes);
+app.use('/api', feedbackRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
