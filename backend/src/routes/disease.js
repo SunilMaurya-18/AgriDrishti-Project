@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const axios = require('axios');
-const FormData = require('form-data');
 const DiseaseResult = require('../models/DiseaseResult');
 const { protect } = require('../middleware/auth');
+const { diagnoseDisease } = require('../services/aiClient');
 
 // Multer in-memory storage
 const upload = multer({
@@ -25,66 +24,16 @@ router.post('/disease-detection', protect, upload.single('image'), async (req, r
   }
 
   try {
-    // Forward image to Python AI microservice
-    const form = new FormData();
-    form.append('file', req.file.buffer, {
-      filename: req.file.originalname,
-      contentType: req.file.mimetype,
-    });
+    // Send image to external AI API (OpenAI Vision)
+    const aiResponse = await diagnoseDisease(req.file.buffer, req.file.mimetype);
 
-    const aiServiceUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8000'}/predict`;
-    let aiResult;
-    const maxAttempts = 3;
-    let lastAiErr;
-
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        const aiResponse = await axios.post(
-          aiServiceUrl,
-          form,
-          {
-            headers: {
-              ...form.getHeaders(),
-              Authorization: req.headers.authorization,
-            },
-            // Render cold starts can take a bit; keep this high enough to avoid false 503s.
-            timeout: 120000,
-          }
-        );
-        aiResult = aiResponse.data;
-        break;
-      } catch (aiErr) {
-        lastAiErr = aiErr;
-        const status = aiErr.response?.status;
-        const code = aiErr.code;
-
-        const retriableStatus = [502, 503, 504].includes(status);
-        const retriableCode = [
-          'ETIMEDOUT',
-          'ECONNRESET',
-          'ECONNREFUSED',
-          'ENOTFOUND',
-          'EAI_AGAIN',
-        ].includes(code);
-
-        const shouldRetry = attempt < maxAttempts && (retriableStatus || retriableCode || !status);
-        if (!shouldRetry) break;
-
-        // Exponential backoff: 2s, 4s ...
-        const delayMs = Math.pow(2, attempt) * 500;
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
-      }
-    }
-
-    if (!aiResult) {
-      console.error('[AI SERVICE ERROR]', lastAiErr?.message, {
-        code: lastAiErr?.code,
-        status: lastAiErr?.response?.status,
-      });
+    if (!aiResponse.success) {
       return res.status(503).json({
-        error: 'AI service unavailable. Please ensure the AI microservice is running.',
+        error: aiResponse.error || 'AI service temporarily unavailable. Please try again in a moment.',
       });
     }
+
+    const aiResult = aiResponse.data;
 
     // Save result to database
     const result = await DiseaseResult.create({
@@ -95,12 +44,12 @@ router.post('/disease-detection', protect, upload.single('image'), async (req, r
       severity:           aiResult.severity || 'moderate',
       treatment:          aiResult.treatment,
       affected_area_percent: aiResult.affected_area_percent,
-      crop_type:          req.body.crop_type || 'unknown',
-      ai_model_version:   aiResult.model_version || '1.0.0',
+      crop_type:          req.body.crop_type || aiResult.crop_type || 'unknown',
+      ai_model_version:   aiResult.model_version || 'openai-gpt4o-mini',
     });
 
     // Broadcast alert if disease detected
-    if (aiResult.disease !== 'Healthy') {
+    if (aiResult.disease !== 'Healthy' && aiResult.disease !== 'No Disease Detected') {
       req.app.locals.broadcast('disease_alert', {
         disease: aiResult.disease,
         confidence: aiResult.confidence,
@@ -119,7 +68,7 @@ router.post('/disease-detection', protect, upload.single('image'), async (req, r
     });
   } catch (err) {
     console.error('[DISEASE DETECTION ERROR]', err);
-    res.status(500).json({ error: 'Disease detection failed' });
+    res.status(500).json({ error: 'Disease detection failed. Please try again.' });
   }
 });
 

@@ -12,21 +12,25 @@ A production-ready, full-stack IoT farm monitoring platform featuring **real-tim
                            ┌──────▼──────┐
                            │   Vercel    │
                            │  (Next.js)  │
-                           └──┬──────┬───┘
-                     /api/*   │      │  /ai/*
-               ┌──────────────▼┐   ┌─▼───────────────┐
-               │  Express API  │   │  FastAPI AI Svc  │
-               │   (Render)    │──►│    (Render)      │
-               └───────┬───────┘   └─────────────────┘
-                       │  Mongoose        ▲ JWT forwarded
-                ┌──────▼──────┐           │
-                │  MongoDB    │     ┌─────┴──────┐
-                │   Atlas     │     │  ESP32 IoT │
-                └─────────────┘     │  Sensors   │
-                                    └────────────┘
+                           └──────┬──────┘
+                            /api/*│
+                      ┌───────────▼────────────┐
+                      │     Express API        │
+                      │      (Render)          │
+                      │  ┌──────────────────┐  │
+                      │  │  aiClient.js     │──┼──► OpenAI Vision API
+                      │  │  (gpt-4o-mini)   │  │    (cloud, no GPU needed)
+                      │  └──────────────────┘  │
+                      └───────────┬────────────┘
+                          Mongoose│
+                       ┌──────────▼──────┐
+                       │    MongoDB      │     ┌──────────────┐
+                       │     Atlas       │     │  ESP32 IoT   │
+                       └─────────────────┘     │  Sensors     │
+                                               └──────────────┘
 ```
 
-All backend and AI service URLs are **hidden** from end-users via Vercel rewrite proxying. Users only interact with `prithvicore.com`.
+All backend URLs are **hidden** from end-users via Vercel rewrite proxying. Users only interact with `prithvicore.com`. Disease detection uses OpenAI's Vision API — no local GPU or Python service needed.
 
 ---
 
@@ -39,25 +43,21 @@ PrithviCore/
 │   ├── src/components/       ← Reusable UI (Cards, Buttons, Charts, Layout)
 │   ├── src/lib/              ← API client, AuthContext, utilities
 │   ├── src/hooks/            ← WebSocket hook
-│   ├── vercel.json           ← Proxy rewrite rules (/api/*, /ai/*)
+│   ├── vercel.json           ← Proxy rewrite rules (/api/*)
 │   └── next.config.js        ← Security headers, env config
 │
 ├── backend/                  ← Node.js · Express · Mongoose
 │   ├── src/routes/           ← 7 route modules (auth, sensor, dashboard…)
 │   ├── src/models/           ← 4 Mongoose schemas (User, SensorData, Disease, OTP)
 │   ├── src/middleware/       ← JWT auth, device API key auth
+│   ├── src/services/         ← AI client (OpenAI Vision API integration)
 │   ├── src/utils/            ← Recommendation engine, helpers
 │   └── src/server.js         ← Express app with full middleware stack
-│
-├── ai-service/               ← Python · FastAPI · PyTorch
-│   ├── main.py               ← ResNet50 disease classifier + JWT auth + rate limiter
-│   ├── requirements.txt
-│   └── Dockerfile
 │
 ├── hardware/
 │   └── esp32_firmware.ino    ← ESP32 Arduino firmware (7 sensors)
 │
-└── docker-compose.yml        ← Local development with all 4 services
+└── docker-compose.yml        ← Local development with all services
 ```
 
 ---
@@ -99,17 +99,13 @@ PrithviCore/
 | cors | 2.8 | Cross-origin whitelisting |
 | morgan | 1.10 | HTTP request logging |
 
-### AI Service
+### AI Disease Detection (External API)
 | Technology | Version | Purpose |
 |-----------|---------|---------|
-| FastAPI | 0.109 | Async Python API with auto-docs |
-| PyTorch | ≥2.1 | Deep learning inference engine |
-| torchvision | ≥0.16 | ResNet50 model + image transforms |
-| Pillow | ≥10.2 | Image preprocessing |
-| NumPy | ≥1.26 | Array computation for affected area |
-| PyJWT | 2.x | JWT token verification |
-| slowapi | — | IP-based rate limiting (10/min) |
-| uvicorn | 0.27 | Production ASGI server |
+| OpenAI API | GPT-4o-mini | Vision-based plant disease classification |
+| axios | 1.6 | HTTP client for API calls with retry logic |
+| — | — | All 38 PlantVillage disease classes preserved |
+| — | — | Confidence threshold (60%) + treatment lookup |
 
 ### Hardware
 | Component | Purpose |
