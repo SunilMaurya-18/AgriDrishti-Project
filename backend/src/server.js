@@ -106,26 +106,7 @@ app.locals.broadcast = (event, data) => {
 // ─── Middleware ─────────────────────────────────────────
 app.use(helmet());
 app.use(cors({
-  origin: function (origin, callback) {
-    const allowedOrigins = [
-      'https://prithvicore.com',
-      'https://www.prithvicore.com',
-      ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : [])
-    ];
-    // Allow requests with no origin (mobile apps, curl, server-to-server)
-    if (!origin) return callback(null, true);
-    // Always allow localhost in development
-    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) return callback(null, true);
-    // Allow Vercel preview deployments
-    if (origin.includes('.vercel.app')) return callback(null, true);
-    // Allow explicit allowlist
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    // In production: reject unknown origins. In dev: allow (for tools like Postman).
-    if (process.env.NODE_ENV === 'production') {
-      return callback(new Error(`CORS: origin ${origin} not allowed`));
-    }
-    return callback(null, true);
-  },
+  origin: true,
   credentials: true,
 }));
 app.use(cookieParser());
