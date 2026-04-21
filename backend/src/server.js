@@ -26,7 +26,8 @@ const app = express();
 const server = http.createServer(app);
 
 // ─── WebSocket Server ───────────────────────────────────
-const wss = new WebSocket.Server({ server });
+// Use explicit /ws path for Render and other proxies
+const wss = new WebSocket.Server({ server, path: '/ws' });
 const clients = new Set();
 
 // Ping interval to keep connections alive (prevents Render timeout)
